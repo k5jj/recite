@@ -1,5 +1,5 @@
 #######################################################################
-# Copyright (c) 2012, Dell Inc.
+# Copyright (c) 2017, Dell Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification,
@@ -45,15 +45,16 @@ import time
 import types
 import xml.dom.minidom
 
-try:
-	import readline
-except:
-	pass
+#try:
+#	import readline
+#except:
+#	pass
 
 # Defaults
 LOGINDEFAULT = "root"
 PASSDEFAULT = "calvin"
 PORTDEFAULT = 443
+DEVICEDEFAULT = 'idrac'
 
 # Strings
 NAME = "name"
@@ -102,6 +103,7 @@ FORMAT = "$FORMAT"
 IP = "$IP"
 LOGIN = "$LOGIN"
 PASS = "$PASS"
+DEVICE = "$DEVICE"
 PORT = "$PORT"
 PROGRAM = "$PROGRAM"
 TIMER = "$TIMER"
@@ -121,6 +123,7 @@ REQ_VARIABLES = [
 	LOGIN,
 	PASS,
 	PORT,
+	DEVICE,
 	PROGRAM,
 	TIMER,
 	USLEEP,
@@ -180,6 +183,7 @@ VARIABLES = {
 	LOGIN: os.getenv("LOGIN") or LOGINDEFAULT,
 	PASS: os.getenv("PASS") or PASSDEFAULT,
 	PORT: PORTDEFAULT,
+	DEVICE: DEVICEDEFAULT,
 	PROGRAM: "False",
 	TIMER: os.getenv("TIMER") or "False",
 	USLEEP: os.getenv("USLEEP") or "30",
@@ -466,7 +470,20 @@ BIOS_METHODS = {
 			}
 		}
 	},
-
+	"GetBIOSCertView": {
+		COMMAND: "get",
+		URL: "cimv2/root/dcim/DCIM_BIOSCertView",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "BIOS.Setup.1-1:NumLock"
+			}
+		}
+	},
+        "GetBIOSCertViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_BIOSCertView"
+	},
 	"GetBIOSEnumeration": {
 		COMMAND: "get",
 		URL: "cimv2/root/dcim/DCIM_BIOSEnumeration",
@@ -553,7 +570,135 @@ BIOS_METHODS = {
 				EXAMPLE: ["IPv4", "Disabled"]
 			}
 		}
-	}
+	},
+        "ExportBootCertificate":{
+                NAME: "ExportBootCertificate",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_BIOSCertService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_BIOSCertService+SystemName=DCIM:ComputerSystem+Name=DCIM:BIOSCertService",
+		PARAMS: {
+                        "IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"FileName": {
+				DEFAULT: None,
+				EXAMPLE: "config.xml"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"CertificateType": {
+				DEFAULT: None,
+				EXAMPLE: "1 - PK, 2 - KEK, 3 - DB, 4 - DBX"
+				},
+			"CertificateSubType": {
+				DEFAULT: None,
+				EXAMPLE: "1 - Certificate, 2 - SHA256, 3 - SHA384, 4 - SHA512"
+				},
+                        "CertificateIdentifier" : {
+                                DEFAULT: None,
+                                EXAMPLE: "45C7C8AE750ACFBB48FC37527D6412DD644DAED8913CCD8A24C94D856967DF8E"
+                                }
+
+		}
+	},
+        "ImportBootCertificate":{
+                NAME: "ExportBootCertificate",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_BIOSCertService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_BIOSCertService+SystemName=DCIM:ComputerSystem+Name=DCIM:BIOSCertService",
+		PARAMS: {
+                        "IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"FileName": {
+				DEFAULT: None,
+				EXAMPLE: "config.xml"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"CertificateType": {
+				DEFAULT: None,
+				EXAMPLE: "1 - PK, 2 - KEK, 3 - DB, 4 - DBX"
+				},
+			"CertificateSubType": {
+				DEFAULT: None,
+				EXAMPLE: "1 - Certificate, 2 - SHA256, 3 - SHA384, 4 - SHA512"
+				},
+                        "CertificateIdentifier" : {
+                                DEFAULT: None,
+                                EXAMPLE: "45C7C8AE750ACFBB48FC37527D6412DD644DAED8913CCD8A24C94D856967DF8E"
+                                }
+		}
+	},
+        "ResetBootCertificate":{
+                NAME: "ResetBootCertificate",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_BIOSCertService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_BIOSCertService+SystemName=DCIM:ComputerSystem+Name=DCIM:BIOSCertService",
+		PARAMS: {
+                	"CertificateType": {
+				DEFAULT: None,
+				EXAMPLE: "0 - All, 1 - PK, 2 - KEK, 3 - DB, 4 - DBX"
+				},
+			"CertificateSubType": {
+				DEFAULT: None,
+				EXAMPLE: "1 - Certificate, 2 - SHA256, 3 - SHA384, 4 - SHA512"
+				},
+                        "CertificateIdentifier" : {
+                                DEFAULT: None,
+                                EXAMPLE: "45C7C8AE750ACFBB48FC37527D6412DD644DAED8913CCD8A24C94D856967DF8E"
+                                }
+
+		}
+	},
+        "DeleteBootCertificate":{
+                NAME: "DeleteBootCertificate",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_BIOSCertService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_BIOSCertService+SystemName=DCIM:ComputerSystem+Name=DCIM:BIOSCertService",
+		PARAMS: {
+                        "CertificateType": {
+				DEFAULT: None,
+				EXAMPLE: "0 - All, 1 - PK, 2 - KEK, 3 - DB, 4 - DBX"
+				},
+			"CertificateSubType": {
+				DEFAULT: None,
+				EXAMPLE: "1 - Certificate, 2 - SHA256, 3 - SHA384, 4 - SHA512"
+				},
+			"CertificateIdentifier" : {
+                                DEFAULT: None,
+                                EXAMPLE: "45C7C8AE750ACFBB48FC37527D6412DD644DAED8913CCD8A24C94D856967DF8E"
+                                }
+
+		}
+	},
+                
 }
 
 FC_METHODS = {
@@ -911,7 +1056,11 @@ NIC_METHODS = {
 				EXAMPLE: ["IPv4", "Disabled"]
 			}
 		}
-	}
+	},
+    "GetHostNetworkInterfaceViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_HostNetworkInterfaceView"
+	},
 }
 
 RAID_METHODS = {
@@ -963,7 +1112,170 @@ RAID_METHODS = {
 			}
 		}
 	},
-
+        "ImportForeignConfig": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			}
+		}
+	},
+        "CheckConsistency": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			}
+		}
+	},
+        "CancelCheckConsistency": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			}
+		}
+	},
+        "StartPatrolRead": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			}
+		}
+	},
+        "StopPatrolRead": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			}
+		}
+	},
+        "RebuildPhysicalDisk": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			}
+		}
+	},
+        "CancelRebuildPhysicalDisk": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			}
+		}
+	},
+        "OnlineCapacityExpansion": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			},
+                        "Size" : {
+                                DEFAULT: None,
+                                EXAMPLE: 65536
+                                }
+		}
+	},
+        "RAIDLevelMigration": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			},
+                        "NewRaidLevel": {
+				DEFAULT: None,
+				EXAMPLE: 2
+			},
+                        "PDArray": {
+				DEFAULT: None,
+				EXAMPLE: "Disk.Bay.0:Enclosure.Internal.0-0:RAID.Integrated.1-1"
+			}
+		}
+	},
+        "RenameVD": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			},
+                        "Name": {
+				DEFAULT: None,
+				EXAMPLE: "NewVDName"
+			}
+		}
+	},
+        "CancelBackgroundInitialization": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			}
+		}
+	},
+        "ClearControllerPreservedCache": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			}
+		}
+	},
+        "SetAssetTag": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			},
+                        "AssetTag": {
+                                DEFAULT: None,
+                                EXAMPLE: "AssetTagString"
+                        }
+		}
+	},
+        "SetAssetName": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.Integrated.1-1"
+			},
+                        "AssetName": {
+                                DEFAULT: None,
+                                EXAMPLE: "AssetNameString"
+                        }
+		}
+	},
 	"ConvertToRAID": {
 		COMMAND: "invoke",
 		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
@@ -1006,6 +1318,10 @@ RAID_METHODS = {
 			"UntilTime": {
 				DEFAULT: "",
 				EXAMPLE: 20211111111111
+			},                        
+                        "RealTime": {
+				DEFAULT: "1",
+				EXAMPLE: "[1 - Real Time], [0 - Staged]"
 			}
 		}
 	},
@@ -1103,6 +1419,49 @@ RAID_METHODS = {
 		}
 	},
 
+    "BlinkTarget": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.3"
+			},
+		}
+	},
+        
+    "UnBlinkTarget": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.3"
+			},
+		}
+	},
+
+    "PrepareToRemove": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.3"
+			},
+		}
+	},
+
+    "SecureErase": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.3"
+			},
+		}
+	},
 	"GetControllerView": {
 		COMMAND: "get",
 		URL: "cimv2/root/dcim/DCIM_ControllerView",
@@ -1119,6 +1478,18 @@ RAID_METHODS = {
 		URL: "cimv2/root/dcim/DCIM_ControllerView"
 	},
 
+	"GetControllerBatteryViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_ControllerBatteryView"
+	},
+	"GetEnclosureEMMViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_EnclosureEMMView"
+	},
+	"GetEnclosurePSUViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_EnclosurePSUView"
+	},	
 	"GetDHSDisks": {
 		COMMAND: "invoke",
 		URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
@@ -1249,6 +1620,21 @@ RAID_METHODS = {
 		COMMAND: "enumerate",
 		URL: "cimv2/root/dcim/DCIM_VirtualDiskView"
 	},
+    
+	"InitializeVirtualDisk": {
+        COMMAND: "invoke",
+        URL: "cimv2/root/dcim/DCIM_RAIDService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_RAIDService+SystemName=DCIM:ComputerSystem+Name=DCIM:RAIDService",
+        PARAMS: {
+            "VirtualDisk": {
+                DEFAULT: None,
+                EXAMPLE: "Disk.Virtual.0:RAID.Slot.2-1"
+            },
+            "InitType": {
+                DEFAULT: 0,
+                EXAMPLE: 0
+            }
+        }
+    },
 
 	"LockVirtualDisk": {
 		COMMAND: "invoke",
@@ -1382,6 +1768,24 @@ RAID_METHODS = {
 }
 
 iDRAC_METHODS = {
+        "ApplyAttribute": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_iDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+		PARAMS: {
+			"Target": {
+				DEFAULT: None,
+				EXAMPLE: "iDRAC.Embedded.1"
+			},
+			"AttributeName": {
+				DEFAULT: None,
+				EXAMPLE: ["Users.4#Enable", "Users.5#Enable"]
+			},
+			"AttributeValue": {
+				DEFAULT: None,
+				EXAMPLE: ["Enabled", "Disabled"]
+			}
+		}
+	},
 	"ApplyAttributes": {
 		COMMAND: "invoke",
 		URL: "cimv2/root/dcim/DCIM_iDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
@@ -1400,7 +1804,81 @@ iDRAC_METHODS = {
 			}
 		}
 	},
-
+        "ImportData": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_iDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+		PARAMS: {
+			"Payload": {
+				DEFAULT: None,
+				EXAMPLE: "Payload text"
+			},
+			"FileType": {
+				DEFAULT: None,
+				EXAMPLE: "1 - ConfigXML, 2 - FW Image"
+			},
+			"PayLoadEncoding": {
+				DEFAULT: None,
+				EXAMPLE: "1 - Text, 2 - Base64"
+			},
+                        "TxfrDescriptor" : {
+                                DEFAULT: None,
+                                EXAMPLE: "1 - Start, 2 - Normal Transmit, 3 - End"
+                        },
+                        "InSessionID" : {
+                                DEFAULT: None,
+                                EXAMPLE: 1234
+                        },
+                        "ChunkSize" : {
+                                DEFAULT: None,
+                                EXAMPLE: 1234
+                        },
+                        "FileSize" : {
+                                DEFAULT: None,
+                                EXAMPLE: 1234
+                        }
+		}
+	},
+        "ExportData": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_iDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+		PARAMS: {
+			"FileType": {
+				DEFAULT: None,
+				EXAMPLE: "1 - ConfigXML, 2 - LC log, 3 - Inventory, 4 - Factory config, 5 - TSR, 6 - Boot video, 7 - Diags, 8 - LC full log, 9 - Crash video"
+			},
+	                "InSessionID" : {
+                                DEFAULT: None,
+                                EXAMPLE: 1234
+                        },
+                        "InChunkSize" : {
+                                DEFAULT: None,
+                                EXAMPLE: 1234
+                        },
+                        "FileOffset" : {
+                                DEFAULT: None,
+                                EXAMPLE: 1234
+                        },
+                        "TxDataSize" : {
+                                DEFAULT: None,
+                                EXAMPLE: 1234
+                        }
+                        
+		}
+	},
+        "ClearTransferSession": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_iDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+		PARAMS: {
+			"FileOperation": {
+				DEFAULT: None,
+				EXAMPLE: "1 - Import, 2 - Export, 3 - Both"
+			},
+	                "FileType" : {
+                                DEFAULT: None,
+                                EXAMPLE: "0 - All, 1 - ConfigXML, 2 - LC Logs, 3 - Inventory, 4 - FactoryConfig, 5 - TSR, 6 - Crash Video, 7 - Diags, 8 - LC Full logs"
+                        }
+		}
+	},
 	"SetiDRACAttribute": {
 		NAME: "SetAttribute",
 		COMMAND: "invoke",
@@ -1481,7 +1959,7 @@ iDRAC_METHODS = {
 		COMMAND: "enumerate",
 		URL: "cimv2/root/dcim/DCIM_iDRACCardAttribute"
 	},
-
+	
 	"GetiDRACCardEnumeration": {
 		COMMAND: "get",
 		URL: "cimv2/root/dcim/DCIM_iDRACCardEnumeration",
@@ -1544,6 +2022,166 @@ iDRAC_METHODS = {
 	"GetiDRACCardViews": {
 		COMMAND: "enumerate",
 		URL: "cimv2/root/dcim/DCIM_iDRACCardView"
+	},
+
+        "iDRACReset": {
+		NAME: "iDRACReset",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"Force": {
+				DEFAULT: "0",
+				EXAMPLE: "[Force = 0  for Garceful reset, Force = 1 for Force reset]"
+			}
+		}
+	},
+
+        "GenerateSSLCSR": {
+		NAME: "GenerateSSLCSR",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+	},
+
+        "SendTestSNMPTrap": {
+		NAME: "SendTestSNMPTrap",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "iDRAC.Embedded.1"
+			}
+		}
+	},
+        "SendTestEmailAlert": {
+		NAME: "SendTestEmailAlert",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "iDRAC.Embedded.1"
+			}
+		}
+	},
+        "ImportSSLCertificate": {
+		NAME: "ImportSSLCertificate",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"SSLCertificateFile": {
+				DEFAULT: None,
+				EXAMPLE: ""
+			},
+                        "CertificateType": {
+				DEFAULT: None,
+				EXAMPLE: "[Server : 1, CA: 2, CSC: 3]"
+			},
+		}
+	},
+
+        "ExportSSLCertificate": {
+		NAME: "ExportSSLCertificate",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"SSLCertType": {
+				DEFAULT: None,
+				EXAMPLE: "[Server : 1, CA: 2, CSC: 3]"
+			},
+		}
+	},
+
+        "DeleteSSLCertificate": {
+		NAME: "DeleteSSLCertificate",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"CertificateType": {
+				DEFAULT: None,
+				EXAMPLE: "[CSC: 3]"
+			},
+		}
+	},
+
+        "iDRACResetCfg": {
+		NAME: "iDRACResetCfg",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"Force": {
+				DEFAULT: "0",
+				EXAMPLE: "[Force = 0  for Garceful reset, Force = 1 for Force reset]"
+			}
+		}
+	},
+
+        "SSLResetCfg": {
+		NAME: "SSLResetCfg",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+	},
+        "GetKVMSession": {
+		NAME: "GetKVMSession",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"SessionTypeName": {
+				DEFAULT: None,
+				EXAMPLE: "Base64 encoded file"
+			}
+		}
+	},
+        "RemoveSelf": {
+		NAME: "RemoveSelf",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"GroupName": {
+				DEFAULT: None,
+				EXAMPLE: "Group Name"
+			}
+		}
+	},
+        "JoinGroup": {
+		NAME: "JoinGroup",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"GroupName": {
+				DEFAULT: None,
+				EXAMPLE: "Group Name"
+			},
+                        "GroupUUID": {
+                                DEFAULT: None,
+                                EXAMPLE: "Group UUID"
+                        },
+                        "GroupPasscode": {
+                                DEFAULT: None,
+                                EXAMPLE: "Group passcode"
+                        },
+                        "CloneConfiguration": {
+                                DEFAULT: None,
+                                EXAMPLE: "Clone configuration"
+                        }
+		}
+	},
+        "DeleteGroup": {
+		NAME: "DeleteGroup",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService",
+                PARAMS: {
+			"GroupName": {
+				DEFAULT: None,
+				EXAMPLE: "Group Name"
+			}
+		}
+	},
+        "GetBootDeviceList": {
+		NAME: "GetBootDeviceList",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_IDRACCardService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_iDRACCardService+SystemName=DCIM:ComputerSystem+Name=DCIM:iDRACCardService"
+
 	}
 }
 
@@ -1575,6 +2213,33 @@ POWER_METHODS = {
 			"ManagedElement": {
 				DEFAULT: "EPR:CIM_ComputerSystem"
 			}
+		}
+	},
+
+	"GetiDRACTime": {
+		NAME: "ManageTime",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dcim/DCIM_TimeService?CreationClassName=DCIM_TimeService+SystemCreationClassName=DCIM_SPComputerSystem+SystemName=systemmc+Name='DCIM TimeService 1'",
+		PARAMS: {
+			"GetRequest": {
+				DEFAULT: "TRUE",
+				
+			}
+		}
+	},
+	
+	"SetiDRACTime": {
+		NAME: "ManageTime",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dcim/DCIM_TimeService?CreationClassName=DCIM_TimeService+SystemCreationClassName=DCIM_SPComputerSystem+SystemName=systemmc+Name='DCIM TimeService 1'",
+		PARAMS: {
+			"GetRequest": {
+				DEFAULT: "FALSE",
+				
+			},
+			"TimeData": {
+				DEFAULT: None,
+				EXAMPLE: "20150813144016.000000+000"}
 		}
 	}
 }
@@ -1641,9 +2306,302 @@ LC_METHODS = {
 	"CreateLCConfigJob": {
 		NAME: "CreateConfigJob",
 		COMMAND: "invoke",
-		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                }
+	},
+        "ReInitiateAutoDiscovery":{
+                NAME: "ReInitiateAutoDiscovery",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "PerformAutoDiscovery": {
+                                DEFAULT: None,
+                                EXAMPLE: "1 - Off, 2 - Now, 3 - NextBoot"
+                        }
+                }
+        },
+        "DownloadServerPublicKey": {
+                NAME: "DownloadServerPublicKey",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "KeyContent": {
+                                DEFAULT: None,
+                                EXAMPLE: "base64 encoded CA private key content"
+                        }
+                }
+        },
+        "DownloadClientCerts": {
+                NAME: "DownloadClientCerts",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "KeyContent": {
+                                DEFAULT: None,
+                                EXAMPLE: "base64 encoded CA private key content"
+                        },
+                        "Password": {
+                                DEFAULT: None,
+                                EXAMPLE: "CA private key password"
+                        },
+                        "CAContent": {
+                                DEFAULT: None,
+                                EXAMPLE: "base64 encoded CA certificate content"
+                        }
+                }
+        },
+        "DeleteAutoDiscoveryServerPublicKey": {
+                NAME: "DeleteAutoDiscoveryServerPublicKey",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"
+        },
+        "DeleteAutoDiscoveryClientCerts": {
+                NAME: "DeleteAutoDiscoveryClientCerts",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"                
+        },
+        "SetCertificateAndPrivateKey": {
+                NAME: "SetCertificateAndPrivateKey",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "Type":{
+                                DEFAULT: None,
+                                EXAMPLE: "Server"
+                        },
+                        "PKCS12":{
+                                DEFAULT: None,
+                                EXAMPLE: "Content of the PKCS#12 file"
+                        },
+                        "PKCS12pin":{
+                                DEFAULT: None,
+                                EXAMPLE: "Password to decode PKCS12"
+                        }
+                        
+                }
+        },
+        "ExportErrorMsgRegistry": {
+                NAME: "ExportErrorMsgRegistry",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "IPAddress": {
+                                DEFAULT: None,
+                                EXAMPLE: "10.10.20.20"
+                        },
+                        "ShareName": {
+                                DEFAULT: None,
+                                EXAMPLE: "Myshare"
+                        },
+                        "FileName":{
+                                DEFAULT: None,
+                                EXAMPLE: "Registry.txt"
+                        },
+                        "ShareType":{
+                                DEFAULT: None,
+                                EXAMPLE: "0 - NFS, 2 - CIFS"
+                        }
+                }
+        },
+        "MapMessageIdsToDetails": {
+                NAME: "MapMessageIdsToDetails",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "EEMIMsgID": {
+                                DEFAULT: None,
+                                EXAMPLE: "UEFI0001"                                
+                        }
+                        
+                }
+        },
+        "ExportServerScreenShot": {
+                NAME: "ExportServerScreenShot",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "FileType": {
+                                DEFAULT: None,
+                                EXAMPLE: "1 - Server screen shot, 2 - Last screen shot, 3 - Preview"
+                        }
+                }
+        },
+        "ExportVideoLog":{
+                NAME: "ExportVideoLog",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "ShareType": {
+                                DEFAULT: None,
+                                EXAMPLE: "4 - Local"
+                        },
+                        "FileType": {
+                                DEFAULT: None,
+                                EXAMPLE: "1 - Boot capture, 2 - Crash capture"
+                        }                        
+                }
+        },
+        "ExportSVGFile": {
+                NAME: "ExportSVGFile",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "ShareType": {
+                                DEFAULT: None,
+                                EXAMPLE: "4 - Local"
+                        }
+                        
+                }
+        },
+        "SupportAssistCollection":{
+                NAME: "SupportAssistCollection",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"
+         },
+        "SupportAssistExportLastCollection":{
+                NAME: "SupportAssistExportLastCollection",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"
+        },
+        "SupportAssistUploadLastCollection":{
+                NAME: "SupportAssistUploadLastCollection",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"
+          },
+        "SupportAssistRegister": {
+                NAME: "SupportAssistRegister",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "PrimaryFirstName":{
+                                DEFAULT: None,
+                                EXAMPLE: "Primary first name"
+                        },
+                        "PrimaryLastName": {
+                                DEFAULT: None,
+                                EXAMPLE: "Primary last name"
+                        },
+                        "PrimaryPhoneNumber": {
+                                DEFAULT: None,
+                                EXAMPLE: "Primary phone number"
+                        },
+                        "PrimaryEmail": {
+                                DEFAULT: None,
+                                EXAMPLE: "Primary email"
+                        },
+                        "CompanyName": {
+                                DEFAULT: None,
+                                EXAMPLE: "Company name"
+                        },
+                        "Street1": {
+                                DEFAULT: None,
+                                EXAMPLE: "Street 1"
+                        },
+                        "City": {
+                                DEFAULT: None,
+                                EXAMPLE: "Austin"
+                        },
+                        "State": {
+                                DEFAULT: None,
+                                EXAMPLE: "Texas"
+                        },
+                        "Zip": {
+                                DEFAULT: None,
+                                EXAMPLE: "000000"
+                        },
+                        "Country": {
+                                DEFAULT: None,
+                                EXAMPLE: "USA"
+                        }
+                }
+        },
+        "SupportAssistSetAutoCollectSchedule": {
+                NAME: "SupportAssistSetAutoCollectSchedule",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+                PARAMS: {
+                        "Time": {
+                                DEFAULT: None,
+                                EXAMPLE: "HH:MM AM/PM specified in 12 hour time digits in the timezone set for the iDRAC"
+                        },
+                        "Recurrence": {
+                                DEFAULT: None,
+                                EXAMPLE: "1 - Quarterly, 2 - Monthly, 3 - Weekly"
+                        }
+                }
+        },
+        "SupportAssistClearAutoCollectSchedule": {
+                NAME: "SupportAssistClearAutoCollectSchedule",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"
+                
+        },
+        "SupportAssistGetAutoCollectSchedule": {
+                NAME: "SupportAssistGetAutoCollectSchedule",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"
+        },
+        "SupportAssistGetEULAStatus": {
+                NAME: "SupportAssistGetEULAStatus",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"
+        },
+        "SupportAssistAcceptEULA": {
+                NAME: "SupportAssistAcceptEULA",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"
+        },
+        "ExposeiSMInstallerToHostOS": {
+                NAME: "ExposeiSMInstallerToHostOS",
+                COMMAND: "invoke",
+                URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService"                
+        },
+	"SetPublicCertificate": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"Type": {
+				DEFAULT: "directoryCA"
+			},
+			"Certificate": {
+				DEFAULT: None,
+				EXAMPLE: ["file:c:/certificate.pem"]
+			}
+		}
 	},
 
+	"TestNetworkShare": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"Workgroup": {
+				DEFAULT: "",
+				EXAMPLE: "WORKGROUP"
+			}
+		}
+	},
+	
 	"ExportHWInventory": {
 		COMMAND: "invoke",
 		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
@@ -1664,7 +2622,7 @@ LC_METHODS = {
 				DEFAULT: "2",
 				EXAMPLE: "0=NFS, 2=CIFS"
 			},
-			"Username": {
+			"UserName": {
 				DEFAULT: "",
 				EXAMPLE: "username"
 			},
@@ -1734,7 +2692,80 @@ LC_METHODS = {
 				DEFAULT: "2",
 				EXAMPLE: "0=NFS, 2=CIFS"
 			},
-			"Username": {
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"Workgroup": {
+				DEFAULT: "",
+				EXAMPLE: "WORKGROUP"
+			}
+		}
+	},
+	"ExportCompleteLCLog": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"FileName": {
+				DEFAULT: None,
+				EXAMPLE: "lclog.xml"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"Workgroup": {
+				DEFAULT: "",
+				EXAMPLE: "WORKGROUP"
+			}
+		}
+	},
+	
+	"ExportCertificate": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"Type": {
+				DEFAULT: None,
+				EXAMPLE: "1 - Default 2 - Custom"
+			},
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"FileName": {
+				DEFAULT: None,
+				EXAMPLE: "lclog.xml"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
 				DEFAULT: "",
 				EXAMPLE: "username"
 			},
@@ -1749,6 +2780,49 @@ LC_METHODS = {
 		}
 	},
 
+        
+	"UpdateOSAppHealthData": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"UpdateType": {
+				DEFAULT: "0",
+                EXAMPLE: "0=Automatic, 1=Manual"
+			},
+		}
+	},
+
+        
+	"ExportTechSupportReport": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+            "DataSelectorArrayIn": {
+				DEFAULT: ["0"],
+				EXAMPLE: ["0=HW Data", "1=OSApp Data Without PII", "2=OSApp Data", "3=TTY Logs"]
+			},
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+		}
+	},
 	"GetLCEnumeration": {
 		COMMAND: "get",
 		URL: "cimv2/root/dcim/DCIM_LCEnumeration",
@@ -1877,6 +2951,199 @@ LC_METHODS = {
 				EXAMPLE: "1"
 			}
 		}
+	},
+
+	"ExportSystemConfiguration": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"FileName": {
+				DEFAULT: None,
+				EXAMPLE: "config.xml"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"ExportUse": {
+				DEFAULT: "1",
+				EXAMPLE: "0 - Default, 1 - Clone, 2 - Replace"
+				},
+			"Target": {
+				DEFAULT: "All",
+				EXAMPLE: "List of FQDDs separated with commas"
+				},
+			"IncludeInExport": {
+				DEFAULT: "3",
+				EXAMPLE: "0 - Default, 1 - Include readonly, 2 - Password hash, 3 - Readonly and Password Hash"
+				},
+		}
+	},
+
+	"ImportSystemConfiguration": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"FileName": {
+				DEFAULT: None,
+				EXAMPLE: "config.xml"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			}
+		}
+	},
+	
+	"ImportSystemConfigurationPreview": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"FileName": {
+				DEFAULT: None,
+				EXAMPLE: "config.xml"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			}
+		}
+	},
+	
+	"GetConfigResults": 
+	{
+        COMMAND: "invoke",
+        URL: "cimv2/root/dcim/DCIM_LCRecordLog",
+        GETPARAMS:
+		{
+            "InstanceID":{
+                DEFAULT: "DCIM:LifeCycleLog",
+                EXAMPLE: "DCIM:LifeCycleLog"
+                }
+        },
+        PARAMS: 
+		{
+            "JobID": {
+                DEFAULT: None,
+                EXAMPLE: "JID_037301715843"
+                }
+        }
+    },
+	
+	"RunePSADiagnostics": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"RunMode": {
+				DEFAULT: "0",
+				EXAMPLE: "0=Express, 1=Extended, 2=LongRun"
+			},
+			"RebootJobType": {
+				DEFAULT: "1",
+				EXAMPLE: "1=PowerCycle 2=Graceful reboot 3=Graceful reboot with forced shutdown"
+			},
+			"ScheduledStartTime": {
+				DEFAULT: "TIME_NOW",
+				EXAMPLE: "yyyymmddhhmmss"
+			},
+			"UntilTime": {
+				DEFAULT: "TIME_NOW",
+				EXAMPLE: "yyyymmddhhmmss"
+			}
+		}
+	},
+	"ExportePSADiagnosticsResult": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"FileName": {
+				DEFAULT: None,
+				EXAMPLE: "lclog.xml"
+			},
+			"ShareType": {
+				DEFAULT: "2",
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"UserName": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			}			
+		}
+	},
+	"SystemErase": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"Component": {
+				DEFAULT: None,
+				EXAMPLE: ["BIOS", "DIAG", "DRVPACK", "IDRAC", "LCDATA"]
+			}
+		}
+	},
+
+    "GetSystemQuickSyncViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_SystemQuickSyncView"
 	}
 }
 
@@ -2166,6 +3433,164 @@ UPDATE_METHODS = {
 				EXAMPLE: "DCIM:INSTALLED:NONPCI:160:0.43"
 			}
 		}
+	},
+	"SetUpdateSchedule": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_SoftwareInstallationService?CreationClassName=DCIM_SoftwareInstallationService+SystemCreationClassName=DCIM_ComputerSystem+SystemName=IDRAC:ID+Name=SoftwareUpdate",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: ["10.10.20.30"]
+			},
+			"ShareName": {
+				DEFAULT: "",
+				EXAMPLE: "Name"
+			},
+			"ShareType": {
+				DEFAULT: "4",
+				EXAMPLE: "0=NFS, 2=CIFS, 4=vFlash"
+			},
+			"Username": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"CatalogName": {
+				DEFAULT: "",
+				EXAMPLE: "Name of the catalog file"
+			},
+			"CatalogID": {
+				DEFAULT: "",
+				EXAMPLE: "ID of the catalog to use"
+			},
+			"ApplyReboot": {
+				DEFAULT: "",
+				EXAMPLE: "0: Reboot Required,1: No Reboot"
+			},
+			"Time": {
+				DEFAULT: "",
+				EXAMPLE: "hh:mm Represents hour and minute of day to run"
+			},
+			"DayofMonth": {
+				DEFAULT: "*",
+				EXAMPLE: "1-31"
+			},
+			"WeekofMonth": {
+				DEFAULT: "*",
+				EXAMPLE: "1-4"
+			},
+			"DayofWeek": {
+				DEFAULT: "*",
+				EXAMPLE: "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+			},
+			"ProxyHostName": {
+				DEFAULT: "",
+				EXAMPLE: "The hostname of the proxy server"
+			},
+			"ProxyUserName": {
+				DEFAULT: "",
+				EXAMPLE: "The username for the proxy server"
+			},
+			"ProxyPassword": {
+				DEFAULT: "",
+				EXAMPLE: "The password for the proxy server"
+			},			
+			"Comment": {
+				DEFAULT: "",
+				EXAMPLE: "Comment"
+			},			
+			"URI": {
+				DEFAULT: "",
+				EXAMPLE: "The URI to the repository catalog file"
+			},			
+			"Repeat": {
+				DEFAULT: "1",
+				EXAMPLE: "1-366"
+			}		
+		}
+	},
+	"GetUpdateSchedule": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_SoftwareInstallationService?CreationClassName=DCIM_SoftwareInstallationService+SystemCreationClassName=DCIM_ComputerSystem+SystemName=IDRAC:ID+Name=SoftwareUpdate",
+		PARAMS: {
+		}
+	},
+	"ClearUpdateSchedule": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_SoftwareInstallationService?CreationClassName=DCIM_SoftwareInstallationService+SystemCreationClassName=DCIM_ComputerSystem+SystemName=IDRAC:ID+Name=SoftwareUpdate",
+		PARAMS: {
+		}
+	},
+	"InstallFromRepository": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_SoftwareInstallationService?CreationClassName=DCIM_SoftwareInstallationService+SystemCreationClassName=DCIM_ComputerSystem+SystemName=IDRAC:ID+Name=SoftwareUpdate",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: ["10.10.20.30"]
+			},
+			"ShareName": {
+				DEFAULT: "",
+				EXAMPLE: "Name"
+			},
+			"ShareType": {
+				DEFAULT: "4",
+				EXAMPLE: "0=NFS, 2=CIFS, 4=vFlash"
+			},
+			"Username": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"CatalogFile": {
+				DEFAULT: "",
+				EXAMPLE: "Name of the catalog file"
+			},
+			"Mountpoint": {
+				DEFAULT: "",
+				EXAMPLE: "Share mount point"
+			},
+			"ApplyUpdate": {
+				DEFAULT: "",
+				EXAMPLE: "0: Do not apply now 1: Apply now"
+			},
+			"RebootNeeded": {
+				DEFAULT: "",
+				EXAMPLE: "0: No 1: Yes"
+			},
+			"ProxyServer": {
+				DEFAULT: "",
+				EXAMPLE: "The hostname of the proxy server"
+			},
+			"ProxyUname": {
+				DEFAULT: "",
+				EXAMPLE: "The username for the proxy server"
+			},
+			"ProxyPasswd": {
+				DEFAULT: "",
+				EXAMPLE: "The password for the proxy server"
+			},
+			"ProxyPort": {
+				DEFAULT: "",
+				EXAMPLE: "Ex:22"
+			},			
+			"ProxyType": {
+				DEFAULT: "",
+				EXAMPLE: "Ex: HTTP/SOCKS"
+			}
+		}
+	},
+	"GetRepoBasedUpdateList": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_SoftwareInstallationService?CreationClassName=DCIM_SoftwareInstallationService+SystemCreationClassName=DCIM_ComputerSystem+SystemName=IDRAC:ID+Name=SoftwareUpdate",
+		PARAMS: {
+		}
 	}
 }
 
@@ -2196,7 +3621,7 @@ SYSTEM_METHODS = {
 
 	"GetComputerSystems": {
 		COMMAND: "enumerate",
-		URL: "cimv2/CIM_ComputerSystem",
+	        URL: "cimv2/root/dcim/CIM_ComputerSystem",
 	},
 
 	"GetCPUViews": {
@@ -2230,6 +3655,25 @@ SYSTEM_METHODS = {
 			}
 		}
 	},
+        "GetFaultLists": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_FaultList"
+	},
+        "GetFaultList": {
+		COMMAND: "get",
+		URL: "cimv2/root/dcim/DCIM_FaultList",
+                GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Fault#03200002#1"
+			}
+		}
+	},
+        
+        "GetHeartBeat": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_HeartBeat"
+	},
 
 	"GetMemoryViews": {
 		COMMAND: "enumerate",
@@ -2250,6 +3694,11 @@ SYSTEM_METHODS = {
 	"GetPCIDeviceViews": {
 		COMMAND: "enumerate",
 		URL: "cimv2/root/dcim/DCIM_PCIDeviceView"
+	},
+    
+	"GetPCIeSSDViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_PCIeSSDView"
 	},
 
 	"GetPCIDeviceView":{
@@ -2278,7 +3727,40 @@ SYSTEM_METHODS = {
 			}
 		}
 	},
+	"GetSwitchConnectionView": {
+		COMMAND: "get",
+		URL: "cimv2/root/dcim/DCIM_SwitchConnectionView",
+                GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "NIC.Integrated.1-3-1"
+			}
+		}
+	},
 
+	"GetSwitchConnectionViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_SwitchConnectionView"
+	},
+
+        "GetPresenceAndStatusSensors": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_PresenceAndStatusSensor"
+	},
+        "GetRollupStatusCollections": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_RollupStatusCollection"
+	},
+        "GetRollupStatusCollection": {
+		COMMAND: "get",
+		URL: "cimv2/root/dcim/DCIM_RollupStatusCollection",
+                GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "iDRAC.Embedded.1#SubSystem.1#Battery"
+			}
+		}
+	},
 	"GetSystemAttributes": {
 		COMMAND: "enumerate",
 		URL: "cimv2/root/dcim/DCIM_SystemAttribute"
@@ -2336,6 +3818,11 @@ SYSTEM_METHODS = {
 		COMMAND: "enumerate",
 		URL: "cimv2/root/dcim/DCIM_SystemView"
 	},
+	
+	"GetViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_View"
+	},
 
 	"GetSystemView": {
 		COMMAND: "get",
@@ -2353,6 +3840,16 @@ SYSTEM_METHODS = {
 		URL: "cimv2/root/dcim/DCIM_VideoView"
 	},
 
+        "GetVideoNWParamsViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_VideoNWParamsView"
+	},
+
+	"GetUSBDeviceViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_USBDeviceView"
+	},	
+
 	"GetVideoView": {
 		COMMAND: "get",
 		URL: "cimv2/root/dcim/DCIM_VideoView",
@@ -2363,7 +3860,10 @@ SYSTEM_METHODS = {
 			}
 		}
 	},
-
+        "ServerPortConnectionRefresh": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_SwitchConnectionService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_SwitchConnectionService+SystemName=DCIM:ComputerSystem+Name=DCIM:SwitchConnectionService"
+	},
 	"SetSystemAttribute": {
 		NAME: "SetAttribute",
 		COMMAND: "invoke",
@@ -2414,7 +3914,17 @@ SYSTEM_METHODS = {
 				EXAMPLE: "System.Embedded.1"
 			}
 		}
-	}
+	},
+        
+    "GetPCIeSSDExtenderViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_PCIeSSDExtenderView"
+	},
+
+    "GetPCIeSSDBackPlaneViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_PCIeSSDBackPlaneView"
+	},
 }
 
 OSD_METHODS = {
@@ -2575,7 +4085,7 @@ OSD_METHODS = {
 
 	"GetOSDConcreteJob": {
 		COMMAND: "get",
-		URL: "cimv2/root/DCIM/DCIM_OSDConcreteJob",
+	        URL: "cimv2/root/dcim/DCIM_OSDConcreteJob",
 		GETPARAMS: {
 			"InstanceID": {
 				DEFAULT: None,
@@ -2586,7 +4096,7 @@ OSD_METHODS = {
 
 	"GetOSDConcreteJobs": {
 		COMMAND: "enumerate",
-		URL: "cimv2/root/DCIM/DCIM_OSDConcreteJob"
+	        URL: "cimv2/root/dcim/DCIM_OSDConcreteJob"
 	},
 
 	"SkipISOImageBoot": {
@@ -2693,6 +4203,41 @@ OSD_METHODS = {
 	"BootToHD": {
 		COMMAND: "invoke",
 		URL: "cimv2/root/dcim/DCIM_OSDeploymentService?CreationClassName=DCIM_OSDeploymentService+Name=DCIM:OSDeploymentService+SystemCreationClassName=DCIM_ComputerSystem+SystemName=DCIM:ComputerSystem"
+	},
+
+	"ConfigurableBootToNetworkISO": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_OSDeploymentService?CreationClassName=DCIM_OSDeploymentService+Name=DCIM:OSDeploymentService+SystemCreationClassName=DCIM_ComputerSystem+SystemName=DCIM:ComputerSystem",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: None,
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: None,
+				EXAMPLE: "Name"
+			},
+			"ImageName": {
+				DEFAULT: None,
+				EXAMPLE: "imagename"
+			},
+			"ShareType": {
+				DEFAULT: None,
+				EXAMPLE: "0=NFS, 2=CIFS"
+			},
+			"Username": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"ResetType": {
+				DEFAULT: "None",
+				EXAMPLE: "0=No reset, 1=Warm reset, 2=Cold reset)"
+			}
+		}
 	}
 }
 
@@ -2882,6 +4427,73 @@ BACKUP_RESTORE_METHODS = {
 				EXAMPLE: "1"
 			}
 		}
+	},	
+	"SetBackupSchedule": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+			"IPAddress": {
+				DEFAULT: "",
+				EXAMPLE: "10.0.0.1"
+			},
+			"ShareName": {
+				DEFAULT: "",
+				EXAMPLE: "Name"
+			},
+			"ImageName": {
+				DEFAULT: "",
+				EXAMPLE: "backup.img"
+			},
+			"ShareType": {
+				DEFAULT: "4",
+				EXAMPLE: "0=NFS, 2=CIFS, 4=vFlash"
+			},
+			"Username": {
+				DEFAULT: "",
+				EXAMPLE: "username"
+			},
+			"Password": {
+				DEFAULT: "",
+				EXAMPLE: "password"
+			},
+			"Passphrase": {
+				DEFAULT: "",
+				EXAMPLE: "WORKGROUP"
+			},
+			"DayOfMonth": {
+				DEFAULT: "*",
+				EXAMPLE: "1-28"
+			},
+			"WeekOfMonth": {
+				DEFAULT: "*",
+				EXAMPLE: "1-4"
+			},
+			"DayOfWeek": {
+				DEFAULT: "*",
+				EXAMPLE: "Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+			},
+			"Repeat": {
+				DEFAULT: "1",
+				EXAMPLE: "1-366"
+			},
+			"MaxNumberOfBackupArchives": {
+				DEFAULT: "1",
+				EXAMPLE: "1-50"
+			}
+		}
+	},	
+	"GetBackupSchedule": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+		}
+	},
+	
+	"ClearBackupSchedule": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_LCService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_LCService+SystemName=DCIM:ComputerSystem+Name=DCIM:LCService",
+		PARAMS: {
+		}
 	}
 }
 
@@ -2891,7 +4503,8 @@ PROFILE_METHODS = {
 		URL: "cimv2/DCIM_RegisteredProfile",
 		GETPARAMS: {
 			"__cimnamespace": {
-				DEFAULT: "root/interop"
+                		DEFAULT: "root/interop",
+                		EXAMPLE: "root/interop"
 			}
 		}
 	},
@@ -2905,7 +4518,8 @@ PROFILE_METHODS = {
 				EXAMPLE: "DCIM:PhysicalAssetRegisteredProfile:1"
 			},
 			"__cimnamespace": {
-				DEFAULT: "root/interop"
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
 			}
 		}
 	},
@@ -2915,7 +4529,8 @@ PROFILE_METHODS = {
 		URL: "cimv2/DCIM_LCRegisteredProfile",
 		GETPARAMS: {
 			"__cimnamespace": {
-				DEFAULT: "root/interop"
+                		DEFAULT: "root/interop",
+                		EXAMPLE: "root/interop"
 			}
 		}
 	},
@@ -2929,7 +4544,8 @@ PROFILE_METHODS = {
 				EXAMPLE: "DCIM:CPU:1.0.0"
 			},
 			"__cimnamespace": {
-				DEFAULT: "root/interop"
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
 			}
 		}
 	}
@@ -2943,7 +4559,11 @@ SERVICE_METHODS = {
 			"Class": {
 				DEFAULT: None,
 				EXAMPLE: "CIM_PowerManagementService"
-			}
+                	},
+	                "__cimnamespace": {
+	                        DEFAULT: "root/dcim",
+	                        EXAMPLE: "root/dcim"
+                	}
 		}
 	},
 
@@ -2969,13 +4589,17 @@ SERVICE_METHODS = {
 			"InstanceID": {
 				DEFAULT: None,
 				EXAMPLE: "NIC.Integrated.1-1-1"
+	                },
+	                "__cimnamespace": {
+	                        DEFAULT: "root/dcim",
+	                        EXAMPLE: "root/dcim"
 			}
 		}
 	},
 
 	"GetAssociatedPowerManagementService": {
 		COMMAND: "enumerate",
-		URL: "cimv2/CIM_AssociatedPowerManagementService"
+		URL: "cimv2/root/dcim/CIM_AssociatedPowerManagementService"
 	},
 
 	"GetEFConfigurationService": {
@@ -3113,7 +4737,65 @@ SENSOR_METHODS = {
 	"GetSensorViews": {
 		COMMAND: "enumerate",
 		URL: "cimv2/root/dcim/CIM_Sensor"
-	}
+	},
+        
+    "GetNumericSensorView":{
+		COMMAND: "get",
+		URL: "cimv2/root/dcim/DCIM_NumericSensor",
+		GETPARAMS: {
+			"__cimnamespace": {
+				DEFAULT: "root/dcim"
+			},
+			"SystemCreationClassName": {
+				DEFAULT: "DCIM_ComputerSystem"
+			},
+			"SystemName": {
+				DEFAULT: "system"
+			},
+			"CreationClassName": {
+				DEFAULT: "DCIM_NumericSensor"
+			},
+			"DeviceID": {
+				DEFAULT: None,
+				EXAMPLE: "[iDRAC.Embedded.1#SystemBoardCPUUsage], [iDRAC.Embedded.1#SystemBoardIOUsage], [iDRAC.Embedded.1#SystemBoardMEMUsage], [iDRAC.Embedded.1#SystemBoardSYSUsage]"
+			},
+		}
+                
+	},
+        
+    "GetNumericSensorViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_NumericSensor"
+	},
+
+    "SetNumericSensor":{
+		COMMAND: "set",
+		URL: "cimv2/root/dcim/DCIM_NumericSensor",
+		GETPARAMS: {
+			"__cimnamespace": {
+				DEFAULT: "root/dcim"
+			},
+			"SystemCreationClassName": {
+				DEFAULT: "DCIM_ComputerSystem"
+			},
+			"SystemName": {
+				DEFAULT: "system"
+			},
+			"CreationClassName": {
+				DEFAULT: "DCIM_NumericSensor"
+			},
+			"DeviceID": {
+				DEFAULT: None,
+				EXAMPLE: "[iDRAC.Embedded.1#SystemBoardCPUUsage], [iDRAC.Embedded.1#SystemBoardIOUsage], [iDRAC.Embedded.1#SystemBoardMEMUsage], [iDRAC.Embedded.1#SystemBoardSYSUsage]"
+			},
+		},
+                PARAMS: {			
+			"UpperThresholdNonCritical": {
+				DEFAULT: None,
+				EXAMPLE: "90"
+			}
+		}
+	},
 }
 
 RECORD_LOG_METHODS = {
@@ -3149,7 +4831,9 @@ RECORD_LOG_METHODS = {
 		COMMAND: "enumerate",
 		URL: "cimv2/root/dcim/DCIM_LCRecordLog"
 	},
-
+	
+	
+	
 	"GetLCRecordLogCapabilities": {
 		COMMAND: "enumerate",
 		URL: "cimv2/root/dcim/DCIM_LCRecordLogCapabilities"
@@ -3412,6 +5096,2568 @@ VFLASH_MANAGEMENT_METHODS = {
 	}
 }
 
+BASE_METRIC_METHODS = {
+	"GetAggregationMetricDefinitions": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_AggregationMetricDefinition",
+	},
+        
+        "GetAggregationMetricDefinition":{
+		COMMAND: "get",
+		URL: "cimv2/root/dcim/DCIM_AggregationMetricDefinition",
+		GETPARAMS: {
+			"__cimnamespace": {
+				DEFAULT: "root/dcim"
+			},
+			"Id": {
+				DEFAULT: None,
+				EXAMPLE: "[DCIM:iDRAC.Embedded.1#SystemBoardCPUUsageStat], [DCIM:iDRAC.Embedded.1#SystemBoardIOUsageStat], [DCIM:iDRAC.Embedded.1#SystemBoardMEMUsageStat], [DCIM:iDRAC.Embedded.1#SystemBoardSYSUsageStat]"
+			},
+		}
+                
+	},
+        
+        "GetAggregationMetricValues": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_AggregationMetricValue",
+	},
+
+         "GetAggregationMetricValue":{
+		COMMAND: "get",
+		URL: "cimv2/root/dcim/DCIM_AggregationMetricValue",
+		GETPARAMS: {
+			"__cimnamespace": {
+				DEFAULT: "root/dcim"
+			},
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "[DCIM:SystemBoard:Avg:CPUUsage:1H], [DCIM:SystemBoard:Avg:CPUUsage:1D], [DCIM:SystemBoard:Avg:CPUUsage:1W]"
+			},
+		}
+                
+	},
+
+    "PeakReset": {
+		NAME: "PeakReset",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_MetricService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_MetricService+SystemName=DCIM:ComputerSystem+Name=DCIM:MetricService",
+		PARAMS: {
+			"UsageType": {
+				DEFAULT: None,
+				EXAMPLE: "[iDRAC.Embedded.1#SystemBoardCPUUsageStat], [iDRAC.Embedded.1#SystemBoardIOUsageStat], [iDRAC.Embedded.1#SystemBoardMEMUsageStat], [iDRAC.Embedded.1#SystemBoardSYSUsageStat]"
+			}
+		}
+	},
+	
+	"GetAvgPowerConsumptionByInterval": {
+		NAME: "GetAvgPowerConsumptionByInterval",
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_MetricService?SystemCreationClassName=DCIM_ComputerSystem+CreationClassName=DCIM_MetricService+SystemName=DCIM:ComputerSystem+Name=DCIM:MetricService",
+		PARAMS: {
+			"Interval": {
+				DEFAULT: 0,
+				EXAMPLE: "Interval from 30 seconds to 15 minutes"
+			},
+			"Device": {
+				DEFAULT: None,
+				EXAMPLE: "System, CPU, Memory"
+			}
+		}
+	},
+        
+}
+
+PCSV_METHODS = {
+	"GetPhysicalComputerSystemViews": {
+		COMMAND: "enumerate",
+		URL: "cimv2/root/dcim/DCIM_PhysicalComputerSystemView",
+	},
+        
+
+        "ModifyPersistentBootConfigOrder": {
+		COMMAND: "invoke",
+		URL: "cimv2/root/dcim/DCIM_PhysicalComputerSystemView?InstanceID=srv:system",
+		PARAMS: {
+                        "StructuredBootString": {
+				DEFAULT: None,
+				EXAMPLE: "IPL:BIOS.Setup.1-1#BootSeq#HardDisk.List.1-1#c9203080df84781e2ca3d512883dee6f"
+			}
+		}
+	}
+        
+}
+
+CHASSIS_METHODS = {
+	"GetModularChassisViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_ModularChassisView?__cimnamespace=root/dell/cmc",
+	},
+	
+	"GetModularChassisView": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ModularChassisView",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "dcim:System.Chassis.1"
+			}
+		}
+	},
+	
+	"GetBladeServerViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_BladeServerView?__cimnamespace=root/dell/cmc",
+	},
+	"GetBladeServerView": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_BladeServerView",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "dcim:System.Modular.01"
+			}
+		}
+	},
+	"GetMgmtControllerServices": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_MgmtControllerService",
+	},
+	"GetMgmtControllerService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_MgmtControllerService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "DCIM_MgmtControllerService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "mgmtcontrollerservice1"
+			},
+		}
+	},
+	
+	"GetSystemInfoProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_SystemInfoProfile?__cimnamespace=root/interop",
+	},	
+	"GetSystemInfoProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_SystemInfoProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:ModularSystemInfo:1.0.0"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetStorageSledViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_StorageSledView?__cimnamespace=root/dell/cmc",
+	},
+	"GetStorageSledView": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_StorageSledView",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "dcim:System.StorageSled.1"
+			}
+		}
+	},
+	
+	"GetModularSystemViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_ModularSystemView?__cimnamespace=root/dell/cmc",
+	},
+	
+	"GetComputerSystemViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_ComputerSystem?__cimnamespace=root/dell/cmc",
+	},
+	
+	"GetSlotViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_Slot?__cimnamespace=root/dell/cmc",
+	},
+
+	"GetPhysicalPackages": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PhysicalPackage?__cimnamespace=root/dell/cmc",
+	},
+	
+	"SetBIOSAttributes": {
+		NAME: "SetBIOSAttributes",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_MgmtControllerService?SystemCreationClassName=Dell_ChassisMgr+CreationClassName=DCIM_MgmtControllerService+SystemName=systemmc+Name=mgmtcontrollerservice1",
+		PARAMS: {
+			"SystemFQDD": {
+				DEFAULT: None,
+				EXAMPLE: "System.Modular.01"
+			},
+			"FQDD": {
+				DEFAULT: None,
+				EXAMPLE: "Network.MC.01"
+			},
+			"AttributeName": {
+				DEFAULT: None,
+				EXAMPLE: "LANEnabled"
+			},
+			"AttributeValue": {
+				DEFAULT: None,
+				EXAMPLE: "true"
+			}
+		}
+	}
+
+}
+CMC_NIC_METHODS = {
+	"GetSimpleNICServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICService?__cimnamespace=root/dell/cmc",
+	},	
+	"GetSimpleNICService": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICService",
+		GETPARAMS: {
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:snicsvc:01"
+			}
+		}
+	},
+	"GetSimpleNICAttributeChassEnums": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICAttributeChassEnum?__cimnamespace=root/dell/cmc",
+	},
+	"GetSimpleNICAttributeChassEnum": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICAttributeChassEnum",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:snicenu:00:0000020C"
+			}
+		}
+	},
+	"GetSimpleNICAttributeChassInts": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICAttributeChassInt?__cimnamespace=root/dell/cmc",
+	},
+	"GetSimpleNICAttributeChassInt": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICAttributeChassInt",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:snicint:00:000000CC"
+			}
+		}
+	},
+	"GetSimpleNICAttributeChassStrs": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICAttributeChassStr?__cimnamespace=root/dell/cmc",
+	},
+	"GetSimpleNICAttributeChassStr": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICAttributeChassStr",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:snicstr:00:00000167"
+			}
+		}
+	},
+	"GetSimpleNICAttributeEnums": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICAttributeEnum?__cimnamespace=root/dell/cmc",
+	},
+	"GetSimpleNICAttributeEnum": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICAttributeEnum",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:snicenu:00:00000130"
+			}
+		}
+	},
+	"GetSimpleNICAttributeInts": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICAttributeInt?__cimnamespace=root/dell/cmc",
+	},
+	"GetSimpleNICAttributeInt": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICAttributeInt",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:snicint:00:000000CC"
+			}
+		}
+	},
+	"GetSimpleNICAttributeStrs": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICAttributeStr?__cimnamespace=root/dell/cmc",
+	},
+	"GetSimpleNICAttributeStr": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICAttributeStr",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:snicstr:00:00000167"
+			}
+		}
+	},
+	"GetSimpleNICConcreteCollections": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICConcreteCollection?__cimnamespace=root/dell/cmc",
+	},
+	"GetSimpleNICConcreteCollection": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICConcreteCollection",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:sniccol:01"
+			}
+		}
+	},
+	"GetSimpleNICProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICProfile?__cimnamespace=root/dell/cmc",
+	},
+	"GetSimpleNICProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg18"
+			}
+		}
+	},
+	"GetSimpleNICServiceCapabilities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleNICServiceCapabilities?__cimnamespace=root/dell/cmc",
+	},
+	"GetSimpleNICServiceCapability": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SimpleNICServiceCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:sniccap:01"
+			}
+		}
+	}
+	
+}
+
+MODULAR_METHODS = {
+	"GetModularCapabilities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_ModularCapabilities?__cimnamespace=root/dell/cmc",
+	},	
+	"GetModularCapability": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ModularCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:ModCap1"
+			}
+		}
+	},
+	"GetModularProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_ModularProfile?__cimnamespace=root/interop",
+	},	
+	"GetModularProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_ModularProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg1"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetModularViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Modular",
+	},
+	"GetModularView": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Modular",
+		GETPARAMS: {
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "systemmodular"
+			},
+			"CreationClassName": {
+		                DEFAULT: "Dell_Modular",
+		                EXAMPLE: "Dell_Modular"
+			}
+			
+		}
+	},
+	"GetPassThroughCapabilities": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PassThroughCapabilities",
+	},
+	"GetPassThroughCapability": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PassThroughCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:PassThroughCap:1"
+			}
+			
+		}
+	},
+	
+	"GetKVMs": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_KVM",
+	},
+	
+	"GetKVMPackages": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_KVMPackage",
+	},
+	"GetKVMPackage": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_KVMPackage",
+		GETPARAMS: {
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "pkg501"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_KVMPackage"
+			
+			}
+		}
+	},
+	"GetPassThroughModules": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PassThroughModule",
+	},
+	"GetPassThroughModule":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PassThroughModule",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_Modular"
+			},
+			"SystemName": {
+				DEFAULT: "systemmodular"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_PassThroughModule"
+			},
+			"DeviceID": {
+				DEFAULT: None,
+				EXAMPLE: "iom3"
+			},
+		}
+	},
+	"GetPhysicalAssetProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PhysicalAssetProfile?__cimnamespace=root/interop",
+	},	
+	"GetPhysicalAssetProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PhysicalAssetProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg7"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},	
+	"GetPowerSupplies": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerSupply",
+	},
+	"GetPowerSupply":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerSupply",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_Modular"
+			},
+			"SystemName": {
+				DEFAULT: "systemmodular"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_PowerSupply"
+			},
+			"DeviceID": {
+				DEFAULT: None,
+				EXAMPLE: "ps2"
+			},
+		}
+	},
+	"GetPSPackages": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PSPackage",
+	},
+	"GetPSPackage":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PSPackage",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_PSPackage"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "pkg201"
+			},
+		}
+	},
+	"GetPSSlots": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PSSlot",
+	},
+	"GetPSSlot":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PSSlot",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_PSSlot"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "slot201"
+			},
+		}
+	},
+	"GetBladeCapabilities": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BladeCapabilities",
+	},
+	"GetBladeCapability":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BladeCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:BladeCapabilities001"
+			},
+		}
+	},
+	"GetBladePackages": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BladePackage",
+	},
+	"GetBladePackage":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BladePackage",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_BladePackage"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "pkg001"
+			},
+		}
+	},
+	"GetBladeServers": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BladeServer",
+	},
+	"GetBladeServer":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BladeServer",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_BladeServer"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "system1"
+			},
+		}
+	},
+	"GetCards": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Card",
+	},
+	"GetCard":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Card",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_Card"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "card1"
+			},
+		}
+	},
+	"GetChassisManagers": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChassisMgr",
+	},
+	"GetChassisManager":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChassisMgr",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "systemmc"
+			},
+		}
+	},
+	"GetChassisViews": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Chassis",
+	},
+	"GetChassis":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Chassis",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_Chassis"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "chassis1"
+			},
+		}
+	},
+	"GetChassisManagerPackages": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChMgrPackage",
+	},
+	"GetChassisManagerPackage":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChMgrPackage",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_ChMgrPackage"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "pkg101"
+			},
+		}
+	},
+	"GetChassisManagerProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_ChMgrProfile?__cimnamespace=root/interop",
+	},	
+	"GetChassisManagerProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_ChMgrProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg3"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetChassisManagerSlots": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChMgrSlot",
+	},
+	"GetChassisManagerSlot":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChMgrSlot",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_ChMgrSlot"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "slot101"
+			},
+		}
+	},
+	"GetFanPackages": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_FanPackage",
+	},
+	"GetFanPackage":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_FanPackage",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_FanPackage"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "pkg308"
+			},
+		}
+	},
+	"GetFans": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Fan",
+	},
+	"GetFan":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Fan",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_Modular"
+			},
+			"SystemName": {
+				DEFAULT: "systemmodular"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_Fan"
+			},
+			"DeviceID": {
+				DEFAULT: None,
+				EXAMPLE: "fan6"
+			},
+		}
+	},
+	"GetFanSlots": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_FanSlot",
+	},
+	"GetFanSlot":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_FanSlot",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_FanSlot"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "slot308"
+			},
+		}
+	},
+	"GetIOMPackages": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_IOMPackage",
+	},
+	"GetIOMPackage":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_IOMPackage",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_IOMPackage"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "pkg101"
+			},
+		}
+	},
+	
+	"BladeServerRequestStateChange": {
+		NAME: "RequestStateChange",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_BladeServer",
+		PARAMS: {
+			"RequestedState": {
+				DEFAULT: None,
+				EXAMPLE: "3"
+			}
+		},
+        GETPARAMS: {
+            "__cimnamespace": {
+				DEFAULT: "root/dell/cmc",
+            },
+            "CreationClassName": {
+				DEFAULT: "Dell_BladeServer",
+            },
+			"Name": {
+				DEFAULT: None,
+                EXAMPLE: "system1a"
+			}
+        }
+	},
+	"ModularServerRequestStateChange": {
+		NAME: "RequestStateChange",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_Modular?__cimnamespace=root/dell/cmc+Name=systemmodular+CreationClassName=Dell_Modular",
+		PARAMS: {
+			"RequestedState": {
+				DEFAULT: None,
+				EXAMPLE: "3"
+			}
+		}
+	},
+	"IOMRequestStateChange": {
+		NAME: "RequestStateChange",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PassThroughModule",
+		PARAMS: {
+			"RequestedState": {
+				DEFAULT: None,
+				EXAMPLE: "11"
+			}
+		},
+        GETPARAMS: {
+            "__cimnamespace": {
+				DEFAULT: "root/dell/cmc",
+            },
+            "CreationClassName": {
+				DEFAULT: "Dell_PassThroughModule",
+            },
+            
+            "SystemCreationClassName": {
+				DEFAULT: "Dell_Modular",
+            },
+            
+            "SystemName": {
+				DEFAULT: "systemmodular",
+            },
+			"DeviceID": {
+				DEFAULT: None,
+                EXAMPLE: "iom1"
+			}
+        }
+	},
+}
+PWRMETRICS_METHODS = {
+	"GetAggregationPCPwrMetricDefs": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AggregationPCPwrMetricDef",
+	},
+	"GetAggregationPCPwrMetricDef": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AggregationPCPwrMetricDef",
+		GETPARAMS: {
+			"Id": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:AvgPCAmd"
+			}
+			
+		}
+	},
+	"GetAggregationPCPwrMetricValues": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AggregationPCPwrMetricValue",
+	},
+	"GetAggregationPCPwrMetricValue": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AggregationPCPwrMetricValue",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:AvgPCAmv"
+			}
+			
+		}
+	},
+	"GetAggregationPwrMetricDefs": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AggregationPwrMetricDef",
+	},
+	"GetAggregationPwrMetricDef": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AggregationPwrMetricDef",
+		GETPARAMS: {
+			"Id": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:HiAmd1"
+			}
+			
+		}
+	},
+	"GetAggregationPwrMetricValues": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AggregationPwrMetricValue",
+	},
+	"GetAggregationPwrMetricValue": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AggregationPwrMetricValue",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:HiAmv1"
+			}
+			
+		}
+	},
+	"GetBaseMetricProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_BaseMetricProfile?__cimnamespace=root/interop",
+	},	
+	"GetBaseMetricProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_BaseMetricProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg11"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetPowerMetricServices": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerMetricService",
+	},
+	"GetPowerMetricServiceCaps": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PwrMetricSrvcCaps",
+	},
+	"GetPowerMetricServiceCap": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PwrMetricSrvcCaps",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:MCapabilities1"
+			}
+			
+		}
+	},
+	"ControlMetrics": {
+		NAME: "ControlMetrics",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerMetricService?__cimnamespace=root/dell/cmc+Name=MService1+CreationClassName=Dell_PowerMetricService+SystemName=systemmodular+SystemCreationClassName=Dell_ComputerSystem",
+		PARAMS: {
+			"MetricCollectionEnabled": {
+				DEFAULT: None,
+				EXAMPLE: "4"
+			}
+		}
+	},
+
+}
+PWRMGMT_METHODS = {
+	"GetPWRMGMTServices": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerMgmtSvc",
+	},
+	"GetPWRMGMTService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerMgmtSvc",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ComputerSystem"
+			},
+			"SystemName": {
+				DEFAULT: "systemmodular"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_PowerMgmtSvc"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "pwrSvc1"
+			},
+		}
+	},
+	"GetPWRStateMGMTProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerStateMgmtProfile?__cimnamespace=root/interop",
+	},	
+	"GetPWRStateMGMTProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerStateMgmtProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg4"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetPowerMGMTCaps": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerMgmtCap",
+	},
+	"GetPowerMGMTCap": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerMgmtCap",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:pscap1"
+			}
+			
+		}
+	},
+	
+	"ServerBasedPowerMgmtEnable": {
+		NAME: "ServerBasedPowerMgmtEnable",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_MgmtControllerService?__cimnamespace=root/dell/cmc+SystemCreationClassName=Dell_ChassisMgr+SystemName=systemmc+CreationClassName=DCIM_MgmtControllerService+Name=mgmtcontrollerservice1",
+		PARAMS: {
+			"Mode": {
+				DEFAULT: None,
+				EXAMPLE: "True"
+			}
+		}
+	},
+	"SetChassisExternalPowerCap": {
+		NAME: "SetChassisExternalPowerCap",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_MgmtControllerService?SystemCreationClassName=Dell_ChassisMgr+CreationClassName=DCIM_MgmtControllerService+SystemName=systemmc+Name=mgmtcontrollerservice1",
+		PARAMS: {
+			"PowerCapValue": {
+				DEFAULT: None,
+				EXAMPLE: "15000"
+			},
+			"ForceMode": {
+				DEFAULT: None,
+				EXAMPLE: "True"
+			}
+		}
+	},
+	"MaxPowerConservationModeEnable": {
+		NAME: "MaxPowerConservationModeEnable",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_MgmtControllerService?SystemCreationClassName=Dell_ChassisMgr+CreationClassName=DCIM_MgmtControllerService+SystemName=systemmc+Name=mgmtcontrollerservice1",
+		PARAMS: {
+			"Mode": {
+				DEFAULT: None,
+				EXAMPLE: "True"
+			}
+		}
+	}	
+	
+}
+
+PWRSENSORS_METHODS = {
+
+	"GetSensorsProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SensorsProfile?__cimnamespace=root/interop",
+	},	
+	"GetSensorsProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SensorsProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg16"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetChassisNumSensors": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChassisNumSensor",
+	},
+	"GetChassisNumSensor":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChassisNumSensor",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_Modular"
+			},
+			"SystemName": {
+				DEFAULT: "systemmodular"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_ChassisNumSensor"
+			},
+			"DeviceID": {
+				DEFAULT: None,
+				EXAMPLE: "chassisnumsensor1"
+			},
+		}
+	},
+	"GetPowerSupplyProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerSupplyProfile?__cimnamespace=root/interop",
+	},	
+	"GetPowerSupplyProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerSupplyProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg12"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetPowerSupplySensors": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerSupplySensor",
+	},
+	"GetPowerSupplySensor":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerSupplySensor",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_Modular"
+			},
+			"SystemName": {
+				DEFAULT: "systemmodular"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_PowerSupplySensor"
+			},
+			"DeviceID": {
+				DEFAULT: None,
+				EXAMPLE: "ACGoodSensor1"
+			},
+		}
+	},
+}
+
+PWRTOPOLOGY_METHODS = {
+
+	"GetAlertOnlyRedundancySets": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AlertonlyRedundancySet",
+	},	
+	"GetAlertOnlyRedundancySet": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AlertonlyRedundancySet",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:alertonlyredundancyset1"
+			}
+			
+		}
+	},
+	
+	"GetDCRedundancySets": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_DCRedundancySet",
+	},	
+	"GetDCRedundancySet": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_DCRedundancySet",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:dcredundancyset1"
+			}
+			
+		}
+	},
+	"GetPowerConfigCaps": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerConfigCap",
+	},	
+	"GetPowerConfigCap": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerConfigCap",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:PwrCfgCap1"
+			}
+			
+		}
+	},
+	"GetPowerConfigServices": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerConfigSvc",
+	},
+	"GetPowerConfigService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PowerConfigSvc",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_PowerConfigSvc"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "PowerConfigurationService1"
+			},
+		}
+	},
+	"GetPowerTopologyProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerTopologyProfile?__cimnamespace=root/interop",
+	},	
+	"GetPowerTopologyProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerTopologyProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg14"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetACRedundancySets": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ACRedundancySet",
+	},	
+	"GetACRedundancySet": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ACRedundancySet",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:acredundancyset1"
+			}
+			
+		}
+	},
+	"GetAdminDomains": {
+		COMMAND: "enumerate",
+		URL:  "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AdminDomain",
+	},
+	"GetAdminDomain":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AdminDomain",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_AdminDomain"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "pwrsrcdom2"
+			},
+		}
+	},
+    
+    "AssignPowerRedundancyPriority": {
+		NAME: "AssignPowerRedundancyPriority",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerConfigSvc?__cimnamespace=root/dell/cmc+Name=PowerConfigurationService1+CreationClassName=Dell_PowerConfigSvc+SystemName=systemmc+SystemCreationClassName=Dell_ChassisMgr",
+		PARAMS: {
+			"RequestedRedundancyPriority": {
+				DEFAULT: None,
+				EXAMPLE: 2
+			}
+		}
+	}
+    
+
+}
+
+CMC_LOG_METHODS = {
+
+	"GetHWLogEntries": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_HWLogEntry",
+	},	
+	"GetHWLogEntry": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_HWLogEntry",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:hwlentry010"
+			}
+			
+		}
+	},
+	"GetRecordLogProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_RecordLogProfile?__cimnamespace=root/interop",
+	},	
+	"GetRecordLogProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_RecordLogProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg2"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetSWLogEntries": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SWLogEntry",
+	},	
+	"GetSWLogEntry": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SWLogEntry",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:swlentry010"
+			}
+			
+		}
+	},
+	"GetHWLogs": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_HWLog",
+	},	
+	"GetHWLog": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_HWLog",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:HardwareLog"
+			}
+			
+		}
+	},
+	"GetSWLogs": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SWLog",
+	},	
+	"GetSWLog": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_SWLog",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:SoftwareLog"
+			}
+			
+		}
+	},
+    
+    "ClearSWLog": {
+		NAME: "ClearLog",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SWLog?__cimnamespace=root/dell/cmc+InstanceID=Dell:SoftwareLog"
+		
+	},
+    
+    "ClearHWLog": {
+		NAME: "ClearLog",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_HWLog?__cimnamespace=root/dell/cmc+InstanceID=Dell:HardwareLog"
+		
+	}
+    
+}
+
+CMC_PROFILE_METHODS = {
+
+	"GetCMCServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_CMCService",
+	},	
+	"GetCMCService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_CMCService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "DCIM_CMCService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:CMCService"
+			},
+		}
+	},
+	"GetCMCRegisteredProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_CMCRegisteredProfile?__cimnamespace=root/interop",
+	},	
+	"GetCMCRegisteredProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_CMCRegisteredProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:CMC:1.0.0"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetCMCStrings": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_CMCString",
+	},	
+	"GetCMCString": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_CMCString",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "CMC.Integrated.1#ActiveDirectory.1#DomainController1"
+			}
+			
+		}
+	},
+	"GetCMCEnumerations": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_CMCEnumeration",
+	},	
+	"GetCMCEnumeration": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_CMCEnumeration",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "CMC.Integrated.1#ActiveDirectory.1#Enable"
+			}
+			
+		}
+	},
+	"GetCMCIntegers": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_CMCInteger",
+	},	
+	"GetCMCInteger": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_CMCInteger",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "CMC.Integrated.1#ActiveDirectory.1#Enable"
+			}
+			
+		}
+	},
+	"GetElementConformstoCMCProfile": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ElementConformsToCMCProfile",
+	},
+}
+
+CMC_EVENT_FILTER_METHODS = {
+
+	"GetEFConfigurationServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_EFConfigurationService",
+	},	
+	"GetEFConfigurationService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_EFConfigurationService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "DCIM_EFConfigurationService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:EFConfigurationService"
+			},
+		}
+	},
+	"GetCMCEventFilters": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_EventFilter",
+	},	
+	"GetCMCEventFilter": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_EventFilter",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "System.Chassis.1#EventFilter#CMC_1_2"
+			}
+			
+		}
+	},
+	"GetCMCEFRegisteredProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_EventFilterRegisteredProfile?__cimnamespace=root/interop",
+	},	
+	"GetCMCEFRegisteredProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_EventFilterRegisteredProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:EventFilter:1.0.0"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+}
+CMC_IOV_METHODS = {
+
+	"GetChassisPCIServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisPCIService",
+	},	
+	"GetChassisPCIService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisPCIService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "DCIM_ChassisPCIService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:PCIChassisService"
+			},
+		}
+	},
+	"GetChassisPCIDeviceViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisPCIDeviceView",
+	},	
+	"GetChassisPCIDeviceView": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisPCIDeviceView",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "RAID:PCIE.ChassisIntegrated.1"
+			}
+			
+		}
+	},
+	"GetChassisPCISlots": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisPCISlot",
+	},	
+	"GetChassisPCISlot":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisPCISlot",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "DCIM_Slot"
+			},
+			"Tag": {
+				DEFAULT: None,
+				EXAMPLE: "PCIE.ChassisSlot.1"
+			}
+		}
+	},
+	"GetChassisPCIRegisteredProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_ChassisPCIRegisteredProfile?__cimnamespace=root/interop",
+	},	
+	"GetChassisPCIRegisteredProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_ChassisPCIRegisteredProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:ModularPCIManagement:1.0.0"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	
+	"ChassisPCIeSlotReassignmentEnable": {
+		NAME: "ChassisPCIeSlotReassignmentEnable",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_MgmtControllerService?__cimnamespace=root/dell/cmc+SystemCreationClassName=Dell_ChassisMgr+SystemName=systemmc+CreationClassName=DCIM_MgmtControllerService+Name=mgmtcontrollerservice1",
+		PARAMS: {
+			"Mode": {
+				DEFAULT: None,
+				EXAMPLE: "1"
+			}
+		}
+	},
+}
+CMC_JOB_CONTROL_METHODS = {
+
+	"GetCMCJobServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_JobService",
+	},	
+	"GetCMCJobService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_JobService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "DCIM_JobService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "JobService"
+			},
+		}
+	},
+	"GetCMCLifecycleJobs": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_LifecycleJob",
+	},	
+	"GetCMCLifecycleJob": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_LifecycleJob",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "JID_CLEARALL"
+			}
+			
+		}
+	},
+	"GetJobControlRegisteredProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_JobControlRegisteredProfile?__cimnamespace=root/interop",
+	},	
+	"GetJobControlRegisteredProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_JobControlRegisteredProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:JobControl:1.0.0"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+}
+CMC_RAID_METHODS = {
+
+	"GetRAIDService": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_RAIDService",
+	},	
+	"GetControllerView": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ControllerView",
+	},
+	"GetEnclosureView": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_EnclosureView",
+	},	
+	"GetPhysicalDiskViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_PhysicalDiskView",
+	},
+	"GetPhysicalDiskView":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_PhysicalDiskView",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Disk.Bay.2:Enclosure.Internal.0-0:RAID.ChassisIntegrated.1-1"
+			},
+		}
+	},
+	"GetVirtualDiskView": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_VirtualDiskView",
+	},
+	"GetRAIDEnumerations": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_RAIDEnumeration",
+	},
+	"GetRAIDEnumeration":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_RAIDEnumeration",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Disk.Bay.2:Enclosure.Internal.0-0:RAID.ChassisIntegrated.1-1:RAIDNegotiatedSpeed"
+			},
+		}
+	},
+	"GetRAIDIntegers": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_RAIDInteger",
+	},
+	"GetRAIDStrings": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_RAIDString",
+	},
+	"GetEnclosureViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_EnclosureEMMView",
+	},
+	"GetEnclosurePSUViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_EnclosurePSUView",
+	},
+	"GetEnclosureFanSensors": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_EnclosureFanSensor",
+	},
+	"GetControllerBatteryViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ControllerBatteryView",
+	},
+	"GetEnclosureTempSensors": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_EnclosureTemperatureSensor",
+	},
+	"GetRAIDVAViews": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_RAIDVAView",
+	},
+	"GetRAIDVAView":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_RAIDVAView",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "RAID.ChassisIntegrated.1-1-4"
+			},
+		}
+	},
+	"GetRAIDRegisteredProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_RAIDRegisteredProfile?__cimnamespace=root/interop",
+	},
+	"GetElementConformstoRAIDProfile": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_ElementConformsToRAIDProfile?__cimnamespace=root/interop",
+	},
+	
+}
+
+CMC_SOFTWARE_ID_METHODS = {
+
+	"GetSoftwareIdentities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_SoftwareIdentity",
+	},
+	
+	"GetSoftwareIdentity":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_SoftwareIdentity",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:INSTALLED#304_C_Disk.Bay.2:Enclosure.Internal.0-0:RAID.ChassisIntegrated.1-1"
+			},
+		}
+	},
+	
+	"GetSoftwareInventoryRegisteredProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_SoftwareInventoryRegisteredProfile?__cimnamespace=root/interop",
+	},
+	"GetSoftwareInventoryRegisteredProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_SoftwareInventoryRegisteredProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:SoftwareInventory:1.0.0"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetElementConformstoSoftwareInventoryProfile": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_ElementConformsToSoftwareInventoryProfile?__cimnamespace=root/interop",
+	},
+}
+
+CMC_RECORD_LOG_METHODS = {
+
+	"GetChassisLogEntries": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisLogEntry",
+	},
+	"GetChassisLogEntry":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisLogEntry",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:ChassisLog:4837"
+			},
+		}
+	},
+	"GetChassisRecordLogs": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisRecordLog",
+	},
+	"GetChassisRecordLog":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisRecordLog",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:ChassisLog"
+			},
+		}
+	},
+	"GetChassisRecordLogCapabilities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisRecordLogCapabilities",
+	},
+	"GetChassisRecordLogCapability":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisRecordLogCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:ChassisLogCapabilities"
+			},
+		}
+	},
+	"GetRecordLogRegisteredProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_RecordLogRegisteredProfile?__cimnamespace=root/interop",
+	},
+	"GetRecordLogRegisteredProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_RecordLogRegisteredProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:RecordLog:1.0.0"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetChassisUseofLog": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisUseOfLog",
+	},
+	"GetChassisLogManagesRecord": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisLogManagesRecord",
+	},
+	"GetElementConformsToRecordLogProfile": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_ElementConformsToRecordLogProfile?__cimnamespace=root/interop",
+	},
+	"GetChassisElementCapabilities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_ChassisElementCapabilities",
+	},
+}
+
+CMC_LICENSE_MGMT_METHODS = {
+
+	"GetLicenseMgmtServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_LicenseManagementService",
+	},
+	"GetLicenses": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_License?__cimnamespace=root/dell/cmc",
+	},
+	"GetLicense":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_License",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "FD00000002272856"
+			},
+		}
+	},
+	"GetLicensableDevices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_LicensableDevice",
+	},
+	"GetLicensableDevice":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/DCIM_LicensableDevice",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "CMC.Integrated.1"
+			},
+		}
+	},
+	"GetLicenseMgmtRegisteredProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_LicenseMgmtRegisteredProfile?__cimnamespace=root/interop",
+	},
+	"GetLicenseMgmtRegisteredProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_LicenseMgmtRegisteredProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "DCIM:LicenseManagement:1.0.0"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetElementConformstoLicenseMgmtProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/DCIM_ElementConformsToLicenseMgmtProfile?__cimnamespace=root/interop",
+	},
+}
+
+CMC_BOOT_CNTRL_METHODS = {
+
+	"GetBootControlProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_BootControlProfile?__cimnamespace=root/interop",
+	},
+	"GetBootControlProfile": {
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_BootControlProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg17"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetBootServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BootService",
+	},
+	"GetBootService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BootService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_BootService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:bootsvc1"
+			},
+		}
+	},
+	"GetBootSourceSettings": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BootSourceSetting",
+	},
+	"GetBootSourceSetting":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BootSourceSetting",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:bootset:sd"
+			},
+		}
+	},
+	"GetBootConfigSettings": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BootConfigSetting",
+	},
+	"GetBootConfigSetting":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BootConfigSetting",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:bootcfgset01"
+			},
+		}
+	},
+	
+}
+
+BLADE_PWR_ALLOC_METHODS = {
+
+	"GetBladePwrMaxResourceSettingDatas": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrMaxResourceAllocationSettingData",
+	},
+	"GetBladePwrMaxResourceSettingData":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrMaxResourceAllocationSettingData",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:Dell_BlPwrMaxResourceAllocationSettingData:1"
+			},
+		}
+	},
+	"GetBladePwrAllocationCapabilities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrAllocationCapabilities",
+	},
+	"GetBladePwrAllocationCapability":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrAllocationCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:Dell_BlPwrAllocationCapabilities:1"
+			},
+		}
+	},
+	"GetBladePwrCurResourceAllocationSettingDatas": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrCurResourceAllocationSettingData",
+	},
+	"GetBladePwrCurResourceAllocationSettingData":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrCurResourceAllocationSettingData",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:Dell_BlPwrCurResourceAllocationSettingData:2"
+			},
+		}
+	},
+	"GetBladePwrMinResourceSettingDatas": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrMinResourceAllocationSettingData",
+	},
+	"GetBladePwrMinResourceSettingData":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrMinResourceAllocationSettingData",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:Dell_BlPwrMinResourceAllocationSettingData:2"
+			},
+		}
+	},
+	"GetBladePwrResourceAllocationSettingDatas": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrResourceAllocationSettingData",
+	},
+	"GetBladePwrResourceAllocationSettingData":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_BlPwrResourceAllocationSettingData",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:Dell_BlPwrResourceAllocationSettingData:2"
+			},
+		}
+	},
+}
+CHASSIS_PWR_ALLOC_METHODS = {
+
+	"GetChassisMaxPwrResourcePools": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChMaxPwrResourcePool",
+	},
+	"GetChassisMaxPwrResourcePool":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChMaxPwrResourcePool",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:ChassisMaxPowerPool1"
+			},
+		}
+	},
+	"GetChassisPwrAllocCaps": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrAllocCap",
+	},
+	"GetChassisPwrAllocCap":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrAllocCap",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:chassispwrcap"
+			},
+		}
+	},
+	"GetChassisPwrAllocProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerAllocationProfile?__cimnamespace=root/interop",
+	},
+	"GetChassisPwrAllocProfile":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_PowerAllocationProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg15"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetChassisPwrCapResSettingDatas": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrCapResSettingData",
+	},
+	"GetChassisPwrCapResSettingData":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrCapResSettingData",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:chassiswarning"
+			},
+		}
+	},
+	"GetChassisPwrResourcePools": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrResourcePool",
+	},
+	"GetChassisPwrResourcePool":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrResourcePool",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:ChassisPowerPool1"
+			},
+		}
+	},
+	"GetChassisPwrResSettingDatas": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrResSettingData",
+	},
+	"GetChassisPwrResSettingData":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrResSettingData",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:chassispwr"
+			},
+		}
+	},
+	"GetChassisPwrRPCCaps": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrRPCCapabilities",
+	},
+	"GetChassisPwrRPCCap":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrRPCCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:chassisRPCSCap1"
+			},
+		}
+	},
+	"GetChassisPwrRPCServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrRPCService",
+	},
+	"GetChassisPwrRPCService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ChPwrRPCService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_ChPwrRPCService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "RPCService1"
+			},
+		}
+	},
+}
+
+ROLE_BASED_AUTHORIZATION_METHODS = {
+
+	"GetRoleBasedAuthServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_RoleBasedAuthorizationService",
+	},
+	"GetRoleBasedAuthService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_RoleBasedAuthorizationService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_RoleBasedAuthorizationService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "service3"
+			},
+		}
+	},
+	"GetRoleBasedAuthProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_RoleBasedAuthProfile?__cimnamespace=root/interop",
+	},
+	"GetRoleBasedAuthProfile":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_RoleBasedAuthProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg8"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetRoleBasedMgmtCapabilities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_RoleBasedManagementCapabilities",
+	},
+	"GetRoleBasedMgmtCapability":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_RoleBasedManagementCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:rbmcap2"
+			},
+		}
+	},
+	"GetPrivileges": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Privilege",
+	},
+	"GetPrivilege":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Privilege",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:CMC_privilege01"
+			},
+		}
+	},
+	"GetRoles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Role",
+	},
+	"GetRole":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Role",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_Role"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "CMC_role16"
+			},
+		}
+	},
+	"GetPrivilegesAD": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PrivilegeAD",
+	},
+	"GetPrivilegeAD":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_PrivilegeAD",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:ADGroup_privilege05"
+			},
+		}
+	},
+	"GetRolesAD": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_RoleAD",
+	},
+	"GetRoleAD":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_RoleAD",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_RoleAD"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "ADGroup_role05"
+			},
+		}
+	},
+}
+
+SIMPLE_IDENTITY_METHODS = {
+
+	"GetAccountManagementServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AccountManagementService",
+	},
+	"GetAccountManagementService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_AccountManagementService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_AccountManagementService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "acctmgmtsrvc1"
+			},
+		}
+	},
+	"GetEnabledLogicalElementCapabilities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_EnabledLogicalElementCapabilities",
+	},
+	"GetEnabledLogicalElementCapability":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_EnabledLogicalElementCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:elecaps1"
+			},
+		}
+	},
+	"GetIdentities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Identity",
+	},
+	"GetIdentity":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Identity",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:CMC_id1"
+			},
+		}
+	},
+	"GetAccounts": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Account",
+	},
+	"GetAccount":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_Account",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_Account"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "account1"
+			},
+		}
+	},
+	"AccountRequestStateChange": {
+		NAME: "RequestStateChange",
+		COMMAND: "invoke",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_Account",
+		PARAMS: {
+			"RequestedState": {
+				DEFAULT: None,
+				EXAMPLE: "3"
+			}
+		},
+        GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_Account"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "account1"
+			},
+		}
+	},
+	"GetSimpleIdentityProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleIdentityProfile?__cimnamespace=root/interop",
+	},
+	"GetSimpleIdentityProfile":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleIdentityProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg6"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+	"GetADGroups": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ActiveDirectoryGroup",
+	},
+	"GetADGroup":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ActiveDirectoryGroup",
+		GETPARAMS: {
+			"CreationClassName": {
+				DEFAULT: "Dell_ActiveDirectoryGroup"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "adgroup1"
+			},
+		}
+	},
+	"GetADServices": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ActiveDirectoryService",
+	},
+	"GetADService":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ActiveDirectoryService",
+		GETPARAMS: {
+			"SystemCreationClassName": {
+				DEFAULT: "Dell_ChassisMgr"
+			},
+			"SystemName": {
+				DEFAULT: "systemmc"
+			},
+			"CreationClassName": {
+				DEFAULT: "Dell_ActiveDirectoryService"
+			},
+			"Name": {
+				DEFAULT: None,
+				EXAMPLE: "adservice1"
+			},
+		}
+	},
+	"GetADAccountMgmtCapabilities": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ADAccountManagementCapabilities",
+	},
+	"GetADAccountMgmtCapability":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_ADAccountManagementCapabilities",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:adcap1"
+			},
+		}
+	},
+	"GetIdentitiesAD": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_IdentityAD",
+	},
+	"GetIdentityAD":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/root/dell/cmc/Dell_IdentityAD",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:ADGroup_id1"
+			},
+		}
+	},
+	"GetSimpleIdentityADProfiles": {
+		COMMAND: "enumerate",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleIdentityADProfile?__cimnamespace=root/interop",
+	},
+	"GetSimpleIdentityADProfile":{
+		COMMAND: "get",
+		URL: "http://schemas.dell.com/wbem/wscim/1/cim-schema/2/Dell_SimpleIdentityADProfile",
+		GETPARAMS: {
+			"InstanceID": {
+				DEFAULT: None,
+				EXAMPLE: "Dell:reg19"
+			},
+			"__cimnamespace": {
+		                DEFAULT: "root/interop",
+		                EXAMPLE: "root/interop"
+			}
+		}
+	},
+}
+
 LC_AREAS = [
 	"BACKUP_RESTORE_METHODS",
 	"BIOS_METHODS",
@@ -3433,12 +7679,46 @@ LC_AREAS = [
 	"SERVICE_METHODS",
 	"SYSTEM_METHODS",
 	"UPDATE_METHODS",
-	"VFLASH_MANAGEMENT_METHODS"
+	"VFLASH_MANAGEMENT_METHODS",
+    "BASE_METRIC_METHODS",
+    "PCSV_METHODS",
 ]
+
 
 METHODS = {}
 for lc_area in LC_AREAS:
 	METHODS.update(eval(lc_area))
+	
+######################################################################################################################
+CMC_AREAS = [
+	"CHASSIS_METHODS",
+	"CMC_NIC_METHODS",
+	"MODULAR_METHODS",
+	"PWRMETRICS_METHODS",
+	"PWRMGMT_METHODS",
+	"PWRSENSORS_METHODS",
+	"PWRTOPOLOGY_METHODS",
+	"CMC_LOG_METHODS",
+	"CMC_PROFILE_METHODS",
+	"CMC_EVENT_FILTER_METHODS",
+	"CMC_IOV_METHODS",
+	"CMC_JOB_CONTROL_METHODS",
+	"CMC_RAID_METHODS",
+	"CMC_SOFTWARE_ID_METHODS",
+	"CMC_RECORD_LOG_METHODS",
+	"CMC_LICENSE_MGMT_METHODS",
+	"CMC_BOOT_CNTRL_METHODS",
+	"BLADE_PWR_ALLOC_METHODS",
+	"CHASSIS_PWR_ALLOC_METHODS",
+	"ROLE_BASED_AUTHORIZATION_METHODS",
+	"SIMPLE_IDENTITY_METHODS"
+]
+
+CMC_METHODS = {}
+
+for cmc_area in CMC_AREAS:
+	CMC_METHODS.update(eval(cmc_area))
+######################################################################################################################
 
 class Log(object):
 	def __init__(self, name, mode):
@@ -3562,7 +7842,6 @@ def parsecmd(command):
 	command = shlex.split(command.strip())
 	method = command.pop(0)
 	params = makeparam(command)
-
 	return method, params
 
 def getfilemode(mdata):
@@ -3604,6 +7883,17 @@ def buildparams(mdata, paramtype, method, params, eprselect, filemode, fnumber):
 			source = [source]
 
 		for val in source:
+			try:
+				if "file:" == val[0:len("file:")]:
+					filename = val[len("file:"):]
+					try:
+						val = open(filename).read()
+					except:
+						print "File '%s' does not exist for param '%s'" % (filename, param)
+						return None
+			except TypeError:
+				pass
+
 			if paramtype == GETPARAMS:
 				if method in METAMETHODS and param == "Class":
 					cmd += "%s?" % val
@@ -3646,8 +7936,11 @@ def buildcmd(command):
 
 	method, params = parsecmd(command)
 
-	if method in METHODS.keys():
+	if method in METHODS.keys() and VARIABLES[DEVICE]=="idrac":
 		mdata = METHODS[method]
+		#print mdata
+	elif method in CMC_METHODS.keys() and VARIABLES[DEVICE]=="cmc":
+		mdata = CMC_METHODS[method]
 	else:
 		if VAR_LINE in VARIABLES: print "%d: " % VARIABLES[VAR_LINE],
 		print "Invalid method '%s'" % method.replace("\\\\", "\\")
@@ -3668,24 +7961,28 @@ def buildcmd(command):
 		if not "win" in sys.platform:
 			cmd += " -a"
 		cmd += " %s" % api
-
+	
 	eprselect = {}
 	for param in params:
 		if param == "-eprselect":
 			try:
 				eprselect = params[param][0]
+				
 			except:
 				print "Invalid syntax for -eprselect=Name=Value,Param:Name=Value,..."
 				return None
-
+			
 			eprselect = parse_eprselect(eprselect)
 
 			break
-
+	
 	filemode = getfilemode(mdata)
+
 	if URL in mdata:
 		url = mdata[URL]
+
 		if "EPR" in mdata[URL]:
+			
 			url = get_cached_epr(mdata[URL], URL, eprselect)
 			if url == None:
 				url = buildurl(method, mdata[URL], eprselect)
@@ -4200,12 +8497,22 @@ def goto(cmd, sub=False):
 def help(command):
 	global PROGRAM
 	global VARIABLES
-
+	#Added hack to generate only CMC Methods help if $DEVICE is cmc
+	global LC_AREAS, CMC_AREAS, METHODS, CMC_METHODS
+	TMP = LC_AREAS
+	TMP_METHODS = METHODS
+	
+	if VARIABLES[DEVICE]=="cmc":
+		LC_AREAS = CMC_AREAS
 	if command == "help":
 		if VARIABLES[PROGRAM] == True:
 			areas = [eval(area) for area in LC_AREAS]
-			x = obj2xml(areas, "LC_AREAS")
+			if VARIABLES[DEVICE]=="idrac":
+				x = obj2xml(areas, "LC_AREAS")
+			else:
+				x = obj2xml(areas, "CMC_AREAS")
 			print x.toxml()
+			LC_AREAS = TMP
 			return
 
 		length = max([len(i) for i in METHODS.keys()]) + 1
@@ -4235,11 +8542,15 @@ def help(command):
 				count += 1
 			print
 	else:
+		if VARIABLES[DEVICE]=="cmc":
+			METHODS = CMC_METHODS
 		command = command.split(" ")
 		if len(command) == 2 and command[1] in METHODS.keys():
 			if VARIABLES[PROGRAM] == True:
 				x = obj2xml(METHODS[command[1]], command[1])
 				print x.toxml()
+				LC_AREAS = TMP
+				METHODS = TMP_METHODS
 				return
 
 			print "%s" % command[1]
@@ -4267,10 +8578,14 @@ def help(command):
 			if VARIABLES[PROGRAM] == True:
 				x = obj2xml(INTERNAL[command[1].lower()], command[1].lower())
 				print x.toxml()
+				LC_AREAS = TMP
+				METHODS = TMP_METHODS
 				return
 
 			for i in INTERNAL[get_camel(command[1].lower())]:
 				print "%s" % i
+	METHODS = TMP_METHODS			
+	LC_AREAS = TMP
 
 def ifcond(cmd):
 	cmd = shlex.split(cmd)
@@ -4476,6 +8791,7 @@ def returncmd(cmd):
 
 	return True
 
+# Process Set $Name Value commands
 def setvar(cmd):
 	global PASS
 	global VARIABLES
@@ -4484,28 +8800,34 @@ def setvar(cmd):
 
 	cmd = cmd.split(" ", 1)
 	if len(cmd) == 1:
+		# Print list of current variables
 		varis = VARIABLES.keys()
 		varis.sort()
 		for i in varis:
 			if i != PASS:
 				print "%s: %s" % (i, VARIABLES[i])
 			else:
+				# Obscure password
 				print "%s: ******" % i
 		return True
 
 	cmd = cmd[1].split(" ", 1)
 	if len(cmd) < 2:
+		# Error on bad syntax
 		help("help set")
 		print "\nRequire 0, 2 or 3 arguments"
 		return None
 
 	if cmd[0] in ["/A", "/a"]:
+		# Expression evaluation and saving result in the variable specified
 		cmd = cmd[1].split(" ", 1)
 		if len(cmd) == 2:
 			try:
+				# Evaluate expression
 				val = eval(replvars(cmd[1]))
 				return setvar("Set %s %s" % (cmd[0], val))
 			except:
+				# Syntax error if expression doesn't evaluate correctly
 				help("help set")
 				print "\nError evaluating set expression"
 				return None
@@ -4514,53 +8836,80 @@ def setvar(cmd):
 			print "\nRequire 0, 2 or 3 arguments"
 			return None
 	else:
+		# Normal set
+
+		# $_ are internal variables
 		if cmd[0][:2] == "$_":
 			print "Unable to set read-only internal variable %s" % cmd[0]
 			return None
 
+		# If $IP, need to do validation of string
 		if cmd[0] == "$IP":
 			ipdata = checkipstr(cmd[1])
 			if not ipdata[0]:
 				print "Skipping malformed IP string in %s" % cmd[1]
 				return True
 			else:
+				# Login portion of the IP string
 				if ipdata[1] != None:
 					VARIABLES[LOGIN] = replvars(ipdata[1])
 				else:
 					VARIABLES[LOGIN] = LOGINDEFAULT
 
+				# Password portion of the IP string
 				if ipdata[2] != None:
 					VARIABLES[PASS] = replvars(ipdata[2])
 				else:
 					if ipdata[1] != None:
-						VARIABLES[PASS] = getpass.getpass("Password for %s: " % cmd[1])
+						# User name is specified, but not password, so prompt for this user's password
+						VARIABLES[PASS] = getpass.getpass("Password for %s: " % replvars(cmd[1]))
 
+				# IP address or hostname
 				if ipdata[3] != None:
 					VARIABLES[IP] = replvars(ipdata[3])
+				
+		elif cmd[0]=="$DEVICE":
+			if cmd[1]=="idrac":	#this sets the DEVICE to default (idrac)
+				VARIABLES[cmd[0]] = replvars(cmd[1])
+			
+			elif cmd[1]=="cmc":
+				VARIABLES[cmd[0]] = replvars(cmd[1])
+			else:
+				print "Permissible values are 'idrac' or 'cmc'. Setting $DEVICE to idrac"
+				VARIABLES[cmd[0]] = replvars('idrac')
+		
 		else:
+			# Any other variable
 			VARIABLES[cmd[0]] = replvars(cmd[1])
 
 		if cmd[0] == VERBOSE:
+			# $VERBOSE has to be a numeric value
 			try:
 				VARIABLES[VERBOSE] = int(VARIABLES[VERBOSE])
 			except:
+				# Default initialize if bad data provided
 				print "Numeric value expected for $VERBOSE"
 				VARIABLES[VERBOSE] = VERBOSE_INIT
 
 		if cmd[0] == PROGRAM:
+			# $PROGRAM has to be True or False
+			#    Also, it forces $VERBOSE = WSMAN, $FORMAT = XML
 			if VARIABLES[PROGRAM] in ["True", "False"]:
 				VARIABLES[PROGRAM] = eval(VARIABLES[PROGRAM])
 
 				setvar("Set %s %s" % (VERBOSE, VERBOSE_WSMAN))
 				setvar("Set %s %s" % (FORMAT, XML))
 			else:
+				# Default back to False if bad data provided
 				print "Boolean value expected for $PROGRAM"
 				VARIABLES[PROGRAM] = False
 
 		if cmd[0] == PORT:
+			# $PORT has to be a numeric value
 			try:
 				VARIABLES[PORT] = int(VARIABLES[PORT])
 			except:
+				# Default initialize to PORTDEFAULT if bad data provided
 				print "Numeric value expected for $PORT"
 				VARIABLES[PORT] = PORTDEFAULT
 
@@ -4720,24 +9069,35 @@ def quote_string(chunk):
 
 	return op + out
 
+# Replace $xxx with the actual variable value
 def replvars(cmd):
 	global PASS
 	global VARIABLES
 	global VAR_DATE
 
+	# Ignore escaped $ as variables
+	cmd = cmd.replace("\$", "###DOLLAR###")
+
+	# Sort in reverse so that longer named variables replaced first
+	#   Set $t hello
+	#   Set $tango bye
+	#   Print $tango should print bye instead of helloango
 	varis = VARIABLES.keys()
 	varis.sort(reverse=True)
 	for var in varis:
 		if var == PASS:
+			# Don't replace password in any circumstance
 			data = "******"
 		else:
 			data = VARIABLES[var].__str__()
 		cmd = cmd.replace(var, data)
 
+	# Replace $_DATE with the current date
 	cmd = cmd.replace(VAR_DATE, time.strftime("%Y%m%d%H%M%S"))
 	cmd = re.sub("\$\w+", "", cmd)
 
-	return cmd
+	# Restore escaped $
+	return cmd.replace("###DOLLAR###", "$")
 
 def xmltoplain(obj, depth=''):
 	offset = "  "
@@ -4768,10 +9128,12 @@ def xmltoplain(obj, depth=''):
 			out += "\n"
 	return out
 
+# Print commands with password replaced with ******
 def securecmd(cmd):
 	global PASS
 	global VARIABLES
 
+	# Winrm or Wsmancli command line -p:pass or -p pass to be replaced with ******
 	if "-p" in cmd:
 		repl = "-p"
 		if "win" in sys.platform:
@@ -4781,6 +9143,7 @@ def securecmd(cmd):
 
 		return cmd.replace(repl + VARIABLES[PASS], repl + "******")
 
+	# Set $IP user:pass@IP to be replaced with user:******@IP
 	if "$IP" in cmd:
 		ipstrre = re.findall("(.+):(.+)@(.+)", cmd)
 		if ipstrre != None and len(ipstrre):
@@ -4982,7 +9345,7 @@ def iprange2list(range):
 ###
 # Command line parsing
 
-
+# Check if string is a valid IPv4 address
 def checkip(ip):
 	ipre = re.findall("^(\d+)\.(\d+)\.(\d+)\.(\d+)$", ip)
 	if not len(ipre):
@@ -4990,6 +9353,7 @@ def checkip(ip):
 
 	return True
 
+# Check if string is a valid hostname format and exists in DNS
 def checkhostname(hn):
 	hnre = re.findall("^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|\b-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|\b-){0,61}[0-9A-Za-z])?)*\.?$", hn)
 	if not len(hnre):
@@ -5002,27 +9366,39 @@ def checkhostname(hn):
 
 	return True
 
+# Check a string if it is a valid IP or user@IP or user:pass@IP formats
 def checkipstr(ipstr):
 	ipstrre = re.findall("^(.+):(.+)@(.+)$", ipstr)
 	if ipstrre != None and len(ipstrre):
+		# user:pass@IP format check
+		
+		# Expand IP address before checking
 		ipstrrepl = replvars(ipstrre[0][2])
+		
+		# Check if valid IP or hostname
 		if checkip(ipstrrepl) == False and checkhostname(ipstrrepl) == False:
 			return False, None, None, None
 
+		# Return all portions - user, pass and IP
 		return True, ipstrre[0][0], ipstrre[0][1], ipstrre[0][2]
 	else:
 		ipstrre = re.findall("^(.+)@(.+)$", ipstr)
 		if ipstrre != None and len(ipstrre):
+			# user@IP format check
+			
 			ipstrrepl = replvars(ipstrre[0][1])
 			if checkip(ipstrrepl) == False and checkhostname(ipstrrepl) == False:
 				return False, None, None, None
 
+			# Return only user and IP, password wasn't specified
 			return True, ipstrre[0][0], None, ipstrre[0][1]
 		else:
+			# ipstr is the IP itself			
 			ipstrrepl = replvars(ipstr)
 			if checkip(ipstrrepl) == False and checkhostname(ipstrrepl) == False:
 				return False, None, None, None
 
+	# Only return IP, nothing else specified
 	return True, None, None, ipstr
 
 def expandipfile(ips, filename=None):
@@ -5065,28 +9441,55 @@ def expandipfile(ips, filename=None):
 
 	return returnips
 
+# Parse arguments from command line
 def parseargs(cmdline=sys.argv):
+	# IP addresses specified
 	ips = []
+	
+	# Name=Value arguments that need to be set as variables
 	args = []
+	
+	# Script files on the command line
 	wins = []
+	
+	# Actual Recite commands
 	cmds = []
+	
+	# Close spawned windows on completion
 	close = False
+	
+	# Default 10 parallel threads
 	parallel = 10
-	quit = False
-	silent = False
 
+	# Quit on completion (useful in interactive mode or if all commands on command line)
+	quit = False
+	
+	# Run in background and exit on completion
+	silent = False
+	
+	# Order of execution
+	#   Args - load all settings on command line
+	#   Cmds - run all commands specified on command line
+	#   Wins - run scripts last
+
+	# Get IP from the environment if present
 	ip = os.getenv("IP")
 	if ip:
+		# Skip env variable if IP already set to something
 		if VARIABLES[IP] != "":
 			ip = None
 
+		# Skip env variable if one provided on command line
 		for i in cmdline:
 			if "IP=" == i[:3]:
 				ip = None
+
+	# If env IP still to be used, append to command line to process further down
 	if ip:
 		cmdline.append("IP=%s" % ip)
 
 	for i in cmdline:
+		# Skip python.exe / recite.exe
 		if i == sys.argv[0]:
 			continue
 
@@ -5097,36 +9500,51 @@ def parseargs(cmdline=sys.argv):
 			quit = True
 
 		elif i[:2] == "-p":
+			# Should be integer value for parallel
 			try:
 				parallel = int(i[2:])
 			except:
 				print "Skipped non-integer value for -p"
 
 		elif i == "-s":
+			# Also force quit in silent since thread shouldn't sit around on being done
 			quit = True
 			silent = True
 
 		else:
+			# Name=Value settings on the command line
 			arg = re.findall("(.+?)=(.+)", i)
+			
+			# Don't treat as argument if there is a space in the name (left hand side of =) - means it is a command
+			#   If $ is first char, it is a shortcut set command - $IP=123
 			if arg != None and len(arg) and not " " in arg[0][0] and arg[0][0][0] != "$":
+				# Special handling of IPs
 				if "IP=" == i[:3]:
 					ips = i[3:].split(",")
 					ips = expandipfile(ips)
+					
+					# If only 1 IP specified
+					#   move first to arguments list
+					#   will get set using set command in loadargs()
 					if len(ips) == 1:
 						args.insert(0, "IP="+ips[0])
 						ips = []
 				else:
 					args.append(i)
 			elif os.path.isfile(i):
+				# Treat as script if it is a file
 				wins.append(i)
 			else:
+				# Neither argument nor script then it is a command
 				cmds.append(i)
 
+	# If it is script mode len(wins) != 0, then always quit on completion - last command run
 	if quit == True and not len(wins):
 		cmds.append("quit")
 
 	return [ips, args, wins, cmds, close, silent, parallel]
 
+# Load all arguments as variables within Recite
 def loadargs(args):
 	global VARIABLES
 	global VERBOSE
@@ -5137,6 +9555,8 @@ def loadargs(args):
 			s = "Set $%s %s" % (sarg[0], sarg[1])
 			if VARIABLES[VERBOSE] > VERBOSE_WSMAN:
 				print securecmd(s)
+			
+			# Call the internal set function
 			setvar(s)
 		else:
 			print "Skipping malformed argument %s" % arg
@@ -5144,69 +9564,102 @@ def loadargs(args):
 ###
 # Execution
 
+# Poll parallel Recite threads until they exit or 
 def pollprocs(procs, parallel=1):
+	# Ensure only n parallel threads run at a time
 	while len(procs) >= parallel:
 		time.sleep(0.5)
 
 		for ip in procs.keys():
+			# If process has completed, cleanup and delete from procs
 			if procs[ip][0].poll() != None:
 				if len(procs[ip]) > 1:
 					procs[ip][1].close()
 				del procs[ip]
 				print "Completed for %s" % ip
 
+# Kick off multiple parallel instances of Recite - one per IP
 def multiply(ips, args, wins, cmds, close=False, silent=False, parallel=10, delay=0):
-	# Handle multiple IPs
+	# Keep track of child process handles and file descriptors
 	procs = {}
+
+	# Handle multiple IPs
 	for ip in ips:
 		if "win" in sys.platform:
 			if not silent:
+				# Run in a frontend command box
 				cexe = "%s\system32\cmd.exe" % os.getenv("WINDIR")
+				
+				# Run the "start" command to spawn a new foreground window - but run it with an exiting cmd.exe /c
+				#   start /wait because spawner needs to know when child process exits, to kick off the next batch of children
 				cmd = [cexe, "/c", "start", "/wait", "%s IP=%s %s" % (os.path.basename(sys.argv[0]), ip, " ".join(args) + " ".join(cmds) + " ".join(wins)), cexe]
 				if close == False:
+					# Foreground window needs to stick around on completion
 					cmd.append("/k")
 				else:
+					# Foreground window should close if close requested on completion
 					cmd.append("/c")
 			else:
+				# In silent mode, running python.exe directly
 				cmd = []
+				
+			# Handle recite.py versus recite.exe
 			if hasattr(sys, "frozen"):
+				# Recite.exe - don't pass sys.argv[0] - no explicit script.py file specified
 				cmd.extend([sys.executable, "IP=%s" % ip])
 			else:
+				# Recite.py - need to pass recite.py into the command line so that python.exe has script to run
 				cmd.extend([sys.executable, sys.argv[0], "IP=%s" % ip])
 		else:
 			if not silent:
+				# Run xterm on Linux with -e to execute specific command
 				cexe = "/usr/bin/xterm"
 				cmd = [cexe, "-e"]
 			else:
+				# In silent mode, running python.exe directly
 				cmd = []
 			cmd.extend([sys.executable, sys.argv[0], "IP=%s" % ip])
 
+		# Add all other arguments to command line array
 		cmd.extend(args)
 		cmd.extend(wins)
 		cmd.extend(cmds)
 
 		for i in range(len(cmd)):
+			# Escaping " with \"
 			cmd[i] = cmd[i].replace('"', '\\"')
+			
+			# If there is a space in the command, then quote
 			if " " in cmd[i]:
 				cmd[i] = '"' + cmd[i] + '"'
+
+		# Make one long string out of the command array
 		cmd = " ".join(cmd)
 
 		procs[ip] = []
 		if not silent:
+			# Run in a subprocess
 			proc = subprocess.Popen(cmd, shell=True)
 		else:
+			# In silent mode, append process output to a log file, because there isn't a foreground window
 			procs[ip].append(open("%s.log" % ip, "a"))
 			procs[ip][0].seek(0, os.SEEK_END)
+			
+			# Redirect stdout and stderr to the open file descriptor
 			proc = subprocess.Popen(cmd, shell=True, stdout=procs[ip][0], stderr=subprocess.STDOUT)
 
+		# Save the process handle in procs
 		print "Started for %s" % ip
 		procs[ip].insert(0, proc)
 
+		# If delay specified between spawns
 		if delay:
 			time.sleep(delay)
 
+		# Poll to see if any open slots available for parallelization
 		pollprocs(procs, parallel)
 
+	# Wait until last batch of processes complete
 	pollprocs(procs)
 
 def run(inp):
@@ -5609,6 +10062,7 @@ def interactive():
 
 	return ret
 
+# Main function
 def go(cmdline=sys.argv):
 	global CONTEXT_START
 	global CONTEXT_END
@@ -5738,6 +10192,7 @@ def set_logfile(filename=None):
 		LOGFILE = None
 
 if __name__ == "__main__":
+	# In interactive mode, only exits when you "quit"
 	while True:
 		ret = go()
 		if ret != "Loop":
