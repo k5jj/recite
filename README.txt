@@ -321,178 +321,258 @@ Print                                    Quit
 Report                                   Return
 Set                                      Sleep
 Unset                                    Until
-
 BACKUP RESTORE METHODS
 ----------------------
-BackupImage                              RestoreImage
+BackupImage                              ClearBackupSchedule                     
+GetBackupSchedule                        RestoreImage                            
+SetBackupSchedule                       
 
 BIOS METHODS
 ------------
-ChangePassword                           CreateBIOSConfigJob
-DeletePendingBIOSConfiguration           GetBIOSEnumeration
-GetBIOSEnumerations                      GetBIOSInteger
-GetBIOSIntegers                          GetBIOSString
-GetBIOSStrings                           SetBIOSAttribute
-SetBIOSAttributes
+ChangePassword                           CreateBIOSConfigJob                     
+DeleteBootCertificate                    DeletePendingBIOSConfiguration          
+ExportBootCertificate                    GetBIOSCertView                         
+GetBIOSCertViews                         GetBIOSEnumeration                      
+GetBIOSEnumerations                      GetBIOSInteger                          
+GetBIOSIntegers                          GetBIOSString                           
+GetBIOSStrings                           ImportBootCertificate                   
+ResetBootCertificate                     SetBIOSAttribute                        
+SetBIOSAttributes                       
 
 BOOT METHODS
 ------------
-ChangeBootOrderByInstanceID              ChangeBootSourceState
-GetBootConfigSetting                     GetBootConfigSettings
-GetBootSourceSetting                     GetBootSourceSettings
-
-iDRAC METHODS
--------------
-ApplyAttribute                           ApplyAttributes
-CreateiDRACConfigJob                     DeletePendingiDRACConfiguration
-GetiDRACCardAttributes                   GetiDRACCardEnumeration
-GetiDRACCardEnumerations                 GetiDRACCardInteger
-GetiDRACCardIntegers                     GetiDRACCardString
-GetiDRACCardStrings                      GetiDRACCardView
-GetiDRACCardViews                        SetiDRACAttribute
-SetiDRACAttributes
+ChangeBootOrderByInstanceID              ChangeBootSourceState                   
+GetBootConfigSetting                     GetBootConfigSettings                   
+GetBootSourceSetting                     GetBootSourceSettings                   
 
 EVENT FILTER METHODS
 --------------------
-GetEventFilterView                       GetEventFilterViews
-SetEventFilterByCategory                 SetEventFilterByInstanceIDs
+GetEventFilterView                       GetEventFilterViews                     
+SetEventFilterByCategory                 SetEventFilterByInstanceIDs             
+
+FC METHODS
+----------
+CreateFCConfigJob                        DeletePendingFCConfiguration            
+GetFCAttributes                          GetFCCapabilities                       
+GetFCCapability                          GetFCEnumeration                        
+GetFCEnumerations                        GetFCInteger                            
+GetFCIntegers                            GetFCStatistic                          
+GetFCStatistics                          GetFCString                             
+GetFCStrings                             GetFCView                               
+GetFCViews                               SetFCAttribute                          
+SetFCAttributes                         
+
+iDRAC METHODS
+-------------
+ApplyAttribute                           ApplyAttributes                         
+ClearTransferSession                     CreateiDRACConfigJob                    
+DeleteGroup                              DeletePendingiDRACConfiguration         
+DeleteSSLCertificate                     ExportData                              
+ExportSSLCertificate                     GenerateSSLCSR                          
+GetBootDeviceList                        GetKVMSession                           
+GetiDRACCardAttributes                   GetiDRACCardEnumeration                 
+GetiDRACCardEnumerations                 GetiDRACCardInteger                     
+GetiDRACCardIntegers                     GetiDRACCardString                      
+GetiDRACCardStrings                      GetiDRACCardView                        
+GetiDRACCardViews                        ImportData                              
+ImportSSLCertificate                     JoinGroup                               
+RemoveSelf                               SSLResetCfg                             
+SendTestEmailAlert                       SendTestSNMPTrap                        
+SetiDRACAttribute                        SetiDRACAttributes                      
+iDRACReset                               iDRACResetCfg                           
 
 JOB METHODS
 -----------
-CreateRebootJob                          DeleteJobQueue
-GetLifecycleJob                          GetLifecycleJobs
-SetupJobQueue
+CreateRebootJob                          DeleteJobQueue                          
+GetLifecycleJob                          GetLifecycleJobs                        
+SetupJobQueue                           
 
 LC METHODS
 ----------
-ClearProvisioningServer                  CreateLCConfigJob
-ExportFactoryConfiguration               ExportHWInventory
-ExportLCLog                              GetLCEnumeration
-GetLCEnumerations                        GetLCInteger
-GetLCIntegers                            GetLCString
-GetLCStrings                             GetRSStatus
-GetRemoteServicesAPIStatus               InsertCommentInLCLog
-ReInitiateDHS                            SetLCAttribute
-SetLCAttributes
+ClearProvisioningServer                  CreateLCConfigJob                       
+DeleteAutoDiscoveryClientCerts           DeleteAutoDiscoveryServerPublicKey      
+DownloadClientCerts                      DownloadServerPublicKey                 
+ExportCertificate                        ExportCompleteLCLog                     
+ExportErrorMsgRegistry                   ExportFactoryConfiguration              
+ExportHWInventory                        ExportLCLog                             
+ExportSVGFile                            ExportServerScreenShot                  
+ExportSystemConfiguration                ExportTechSupportReport                 
+ExportVideoLog                           ExportePSADiagnosticsResult             
+ExposeiSMInstallerToHostOS               GetConfigResults                        
+GetLCEnumeration                         GetLCEnumerations                       
+GetLCInteger                             GetLCIntegers                           
+GetLCString                              GetLCStrings                            
+GetRSStatus                              GetRemoteServicesAPIStatus              
+GetSystemQuickSyncViews                  ImportSystemConfiguration               
+ImportSystemConfigurationPreview         InsertCommentInLCLog                    
+LCWipe                                   MapMessageIdsToDetails                  
+ReInitiateAutoDiscovery                  ReInitiateDHS                           
+RunePSADiagnostics                       SetCertificateAndPrivateKey             
+SetLCAttribute                           SetLCAttributes                         
+SetPublicCertificate                     SupportAssistAcceptEULA                 
+SupportAssistClearAutoCollectSchedule    SupportAssistCollection                 
+SupportAssistExportLastCollection        SupportAssistGetAutoCollectSchedule     
+SupportAssistGetEULAStatus               SupportAssistRegister                   
+SupportAssistSetAutoCollectSchedule      SupportAssistUploadLastCollection       
+SystemErase                              TestNetworkShare                        
+UpdateOSAppHealthData                   
 
 LICENSE METHODS
 ---------------
-DeleteLicense                            ExportLicense
-ExportLicenseByDevice                    ExportLicenseByDeviceToNetworkShare
-ExportLicenseToNetworkShare              GetLicensableDevice
-GetLicensableDevices                     GetLicense
-GetLicenses                              ImportLicense
-ImportLicenseFromNetworkShare            ReplaceLicense
-ShowLicenseBits
+DeleteLicense                            ExportLicense                           
+ExportLicenseByDevice                    ExportLicenseByDeviceToNetworkShare     
+ExportLicenseToNetworkShare              GetLicensableDevice                     
+GetLicensableDevices                     GetLicense                              
+GetLicenses                              ImportLicense                           
+ImportLicenseFromNetworkShare            ReplaceLicense                          
+ShowLicenseBits                         
 
 NIC METHODS
 -----------
-CreateNICConfigJob                       DeletePendingNICConfiguration
-GetNICAttributes                         GetNICCapabilities
-GetNICCapability                         GetNICEnumeration
-GetNICEnumerations                       GetNICInteger
-GetNICIntegers                           GetNICStatistic
-GetNICStatistics                         GetNICString
-GetNICStrings                            GetNICView
-GetNICViews                              SetNICAttribute
-SetNICAttributes
+CreateNICConfigJob                       DeletePendingNICConfiguration           
+GetHostNetworkInterfaceViews             GetNICAttributes                        
+GetNICCapabilities                       GetNICCapability                        
+GetNICEnumeration                        GetNICEnumerations                      
+GetNICInteger                            GetNICIntegers                          
+GetNICStatistic                          GetNICStatistics                        
+GetNICString                             GetNICStrings                           
+GetNICView                               GetNICViews                             
+SetNICAttribute                          SetNICAttributes                        
 
 OSD METHODS
 -----------
-BootToHD                                 BootToISOFromVFlash
-BootToNetworkISO                         BootToPXE
-ConnectNetworkISOImage                   ConnectRFSISOImage
-DeleteISOFromVFlash                      DetachDrivers
-DetachISOFromVFlash                      DetachISOImage
-DisconnectNetworkISOImage                DisconnectRFSISOImage
-DownloadISOToVFlash                      GetDriverPackInfo
-GetHostMACInfo                           GetNetworkISOImageConnectionInfo
-GetOSDConcreteJob                        GetOSDConcreteJobs
-GetRFSISOImageConnectionInfo             SkipISOImageBoot
-UnpackAndAttach                          UnpackAndShare
+BootToHD                                 BootToISOFromVFlash                     
+BootToNetworkISO                         BootToPXE                               
+ConfigurableBootToNetworkISO             ConnectNetworkISOImage                  
+ConnectRFSISOImage                       DeleteISOFromVFlash                     
+DetachDrivers                            DetachISOFromVFlash                     
+DetachISOImage                           DisconnectNetworkISOImage               
+DisconnectRFSISOImage                    DownloadISOToVFlash                     
+GetDriverPackInfo                        GetHostMACInfo                          
+GetNetworkISOImageConnectionInfo         GetOSDConcreteJob                       
+GetOSDConcreteJobs                       GetRFSISOImageConnectionInfo            
+SkipISOImageBoot                         UnpackAndAttach                         
+UnpackAndShare                          
 
 POWER METHODS
 -------------
-RequestPowerStateChange                  RequestStateChange
+GetPowerManagementCapabilities           GetiDRACTime                            
+RequestPowerStateChange                  RequestStateChange                      
+SetiDRACTime                            
 
 PROFILE METHODS
 ---------------
-GetCIMRegisteredProfile                  GetCIMRegisteredProfiles
-GetLCRegisteredProfile                   GetLCRegisteredProfiles
+GetCIMRegisteredProfile                  GetCIMRegisteredProfiles                
+GetLCRegisteredProfile                   GetLCRegisteredProfiles                 
 
 RAID METHODS
 ------------
-AssignSpare                              CheckVDValues
-ClearForeignConfig                       ConvertToNonRAID
-ConvertToRAID                            CreateRAIDConfigJob
-CreateVirtualDisk                        DeletePendingRAIDConfiguration
-DeleteVirtualDisk                        EnableControllerEncryption
-GetAvailableDisks                        GetControllerView
-GetControllerViews                       GetDHSDisks
-GetEnclosureView                         GetEnclosureViews
-GetPhysicalDiskView                      GetPhysicalDiskViews
-GetRAIDEnumeration                       GetRAIDEnumerations
-GetRAIDInteger                           GetRAIDIntegers
-GetRAIDLevels                            GetRAIDString
-GetRAIDStrings                           GetVirtualDiskView
-GetVirtualDiskViews                      LockVirtualDisk
-ReKey                                    RemoveControllerKey
-ResetConfig                              SetControllerKey
-SetRAIDAttribute                         SetRAIDAttributes
-UnassignSpare
+AssignSpare                              BlinkTarget                             
+CancelBackgroundInitialization           CancelCheckConsistency                  
+CancelRebuildPhysicalDisk                CheckConsistency                        
+CheckVDValues                            ClearControllerPreservedCache           
+ClearForeignConfig                       ConvertToNonRAID                        
+ConvertToRAID                            CreateRAIDConfigJob                     
+CreateVirtualDisk                        DeletePendingRAIDConfiguration          
+DeleteVirtualDisk                        EnableControllerEncryption              
+GetAvailableDisks                        GetControllerBatteryViews               
+GetControllerView                        GetControllerViews                      
+GetDHSDisks                              GetEnclosureEMMViews                    
+GetEnclosurePSUViews                     GetEnclosureView                        
+GetEnclosureViews                        GetPhysicalDiskView                     
+GetPhysicalDiskViews                     GetRAIDEnumeration                      
+GetRAIDEnumerations                      GetRAIDInteger                          
+GetRAIDIntegers                          GetRAIDLevels                           
+GetRAIDString                            GetRAIDStrings                          
+GetVirtualDiskView                       GetVirtualDiskViews                     
+ImportForeignConfig                      InitializeVirtualDisk                   
+LockVirtualDisk                          OnlineCapacityExpansion                 
+PrepareToRemove                          RAIDLevelMigration                      
+ReKey                                    RebuildPhysicalDisk                     
+RemoveControllerKey                      RenameVD                                
+ResetConfig                              SecureErase                             
+SetAssetName                             SetAssetTag                             
+SetControllerKey                         SetRAIDAttribute                        
+SetRAIDAttributes                        StartPatrolRead                         
+StopPatrolRead                           UnBlinkTarget                           
+UnassignSpare                           
 
 RECORD LOG METHODS
 ------------------
-GetLCLogEntries                          GetLCLogEntry
-GetLCRecordLogCapabilities               GetLCRecordLogs
-GetSystemEventLogCapabilities            GetSystemEventLogEntries
-GetSystemEventLogs                       SetLCLogEntryComment
+GetLCLogEntries                          GetLCLogEntry                           
+GetLCRecordLogCapabilities               GetLCRecordLogs                         
+GetSystemEventLogCapabilities            GetSystemEventLogEntries                
+GetSystemEventLogs                       SetLCLogEntryComment                    
 
 ROLE BASED AUTHORIZATION
 ------------------------
-GetUsersAssignedCLPPrivileges            GetUsersAssignedLANPrivileges
-GetUsersAssignedSerialOverLANPrivileges
+GetUsersAssignedCLPPrivileges            GetUsersAssignedLANPrivileges           
+GetUsersAssignedSerialOverLANPrivileges 
 
 SENSOR METHODS
 --------------
-GetSensorView                            GetSensorViews
-SetSensorThreshold
+GetNumericSensorView                     GetNumericSensorViews                   
+GetSensorView                            GetSensorViews                          
+SetNumericSensor                         SetSensorThreshold                      
 
 SERVICE METHODS
 ---------------
-GetAssociatedPowerManagementService      GetClass
-GetEFConfigurationService                GetEPR
-GetPowerManagementService
+GetAssociatedPowerManagementService      GetClass                                
+GetEFConfigurationService                GetEPR                                  
+GetInstance                              GetPowerManagementService               
+Identify                                
 
 SYSTEM METHODS
 --------------
-CreateSystemConfigJob                    DeletePendingSystemConfiguration
-GetCPUView                               GetCPUViews
-GetComputerSystems                       GetFanView
-GetFanViews                              GetMemoryView
-GetMemoryViews                           GetPowerSupplyView
-GetPowerSupplyViews                      GetSystemAttributes
-GetSystemEnumeration                     GetSystemEnumerations
-GetSystemInteger                         GetSystemIntegers
-GetSystemString                          GetSystemStrings
-GetSystemView                            GetSystemViews
-GetVideoView                             GetVideoViews
-SetSystemAttribute                       SetSystemAttributes
+CreateSystemConfigJob                    DeletePendingSystemConfiguration        
+GetCPUView                               GetCPUViews                             
+GetComputerSystems                       GetFanView                              
+GetFanViews                              GetFaultList                            
+GetFaultLists                            GetHeartBeat                            
+GetMemoryView                            GetMemoryViews                          
+GetPCIDeviceView                         GetPCIDeviceViews                       
+GetPCIeSSDBackPlaneViews                 GetPCIeSSDExtenderViews                 
+GetPCIeSSDViews                          GetPowerSupplyView                      
+GetPowerSupplyViews                      GetPresenceAndStatusSensors             
+GetRollupStatusCollection                GetRollupStatusCollections              
+GetSwitchConnectionView                  GetSwitchConnectionViews                
+GetSystemAttributes                      GetSystemEnumeration                    
+GetSystemEnumerations                    GetSystemInteger                        
+GetSystemIntegers                        GetSystemString                         
+GetSystemStrings                         GetSystemView                           
+GetSystemViews                           GetUSBDeviceViews                       
+GetVideoNWParamsViews                    GetVideoView                            
+GetVideoViews                            GetViews                                
+ServerPortConnectionRefresh              SetSystemAttribute                      
+SetSystemAttributes                     
 
 UPDATE METHODS
 --------------
-GetSoftwareIdentities                    GetSoftwareIdentity
-InstallFromURI
+ClearUpdateSchedule                      GetRepoBasedUpdateList                  
+GetSoftwareIdentities                    GetSoftwareIdentity                     
+GetUpdateSchedule                        InstallFromRepository                   
+InstallFromSoftwareIdentity              InstallFromURI                          
+SetUpdateSchedule                       
 
 VFLASH MANAGEMENT METHODS
 -------------------------
-AttachPartition                          CreatePartition
-CreatePartitionUsingImage                DeletePartition
-DetachPartition                          ExportDataFromPartition
-FormatPartition                          GetVFlashPartitionViews
-GetVFlashView                            GetVFlashViews
-InitializeMedia                          ModifyPartition
-VFlashStateChange
+AttachPartition                          CreatePartition                         
+CreatePartitionUsingImage                DeletePartition                         
+DetachPartition                          ExportDataFromPartition                 
+FormatPartition                          GetVFlashPartitionViews                 
+GetVFlashView                            GetVFlashViews                          
+InitializeMedia                          ModifyPartition                         
+VFlashStateChange                       
+
+BASE METRIC METHODS
+-------------------
+GetAggregationMetricDefinition           GetAggregationMetricDefinitions         
+GetAggregationMetricValue                GetAggregationMetricValues              
+GetAvgPowerConsumptionByInterval         PeakReset                               
+
+PCSV METHODS
+------------
+GetPhysicalComputerSystemViews           ModifyPersistentBootConfigOrder         
 
 Python API
 ----------
